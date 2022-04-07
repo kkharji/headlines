@@ -1,0 +1,22 @@
+[package]
+name = "newsapp"
+version = "0.1.0"
+edition = "2021"
+
+[workspace] 
+
+members = [
+  "cli"
+]
+
+[lib]
+name = "newsapp"
+path = "lib/newsapp.rs"
+
+[dependencies]
+serde = {version = "1.0.136", features = ["derive"]}
+serde_json = "1.0.79"
+eyre = "0.6.8"
+color-eyre = "0.6.1"
+ureq = "2.4.0"
+chrono = { version = "0.4.19",  features = [ "serde" ] }
