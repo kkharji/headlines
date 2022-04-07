@@ -1,28 +1,13 @@
 mod error;
 pub mod query;
+mod search_scope;
 pub use error::*;
 use eyre::ContextCompat;
 pub use query::*;
+use search_scope::SearchScope;
 
 static BASEURL: &str = "https://newsapi.org/v2/everything";
 static APIKEY: Option<&str> = option_env!("NEWSAPI_APIKEY");
-
-#[derive(Clone)]
-pub enum SearchScope {
-    Title,
-    Description,
-    Content,
-}
-
-impl Into<String> for SearchScope {
-    fn into(self) -> String {
-        match self {
-            SearchScope::Title => "title".into(),
-            SearchScope::Description => "description".into(),
-            SearchScope::Content => "content".into(),
-        }
-    }
-}
 
 pub fn query_everything(query: &[&str]) -> EverythingBuilder {
     Everything::new(query)
