@@ -1,6 +1,6 @@
 use super::NewsApiCategory;
 use crate::api::{NewsApi, NewsApiEndpoint, NewsApiSearchScope};
-use crate::ArticleCollection;
+use crate::{ArticleCollection, NewsApiCache};
 use chrono::NaiveDate;
 use color_eyre::Result;
 use eyre::{bail, ContextCompat};
@@ -13,7 +13,7 @@ pub fn get_api_key() -> Result<&'static str> {
     APIKEY.wrap_err(errmsg)
 }
 
-pub struct NewsApiBuilder {
+pub struct NewsApiBuilder<'cache> {
     endpoint: NewsApiEndpoint,
     query: Option<Vec<String>>,
     searchin: Option<Vec<NewsApiSearchScope>>,
@@ -27,9 +27,10 @@ pub struct NewsApiBuilder {
     page: u32,
     category: Option<NewsApiCategory>,
     country: Option<String>,
+    cache: Option<&'cache mut NewsApiCache>,
 }
 
-impl Default for NewsApiBuilder {
+impl<'cache> Default for NewsApiBuilder<'cache> {
     fn default() -> Self {
         Self {
             query: None,
@@ -45,11 +46,12 @@ impl Default for NewsApiBuilder {
             page: 1,
             category: None,
             country: None,
+            cache: None,
         }
     }
 }
 
-impl NewsApiBuilder {
+impl<'cache> NewsApiBuilder<'cache> {
     /// Wrapper over NewsApi::request
     pub fn request(self) -> Result<ArticleCollection> {
         let url = self.endpoint.inject_url(BASEURL);
@@ -102,7 +104,11 @@ impl NewsApiBuilder {
             request = request.query("sources", &force_join(self.sources, ","))
         }
 
-        Ok(NewsApi { request }.request()?)
+        Ok(NewsApi {
+            request,
+            cache: self.cache,
+        }
+        .request()?)
     }
 
     /// Set the NewsApi builder's searchin.
@@ -185,6 +191,11 @@ impl NewsApiBuilder {
 
     pub fn between(self, from: NaiveDate, to: NaiveDate) -> Self {
         self.from(from).upto(to)
+    }
+
+    pub fn cache(mut self, cache: &'cache mut NewsApiCache) -> Self {
+        self.cache = Some(cache);
+        self
     }
 }
 

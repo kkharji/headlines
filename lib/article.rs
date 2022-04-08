@@ -8,19 +8,17 @@ pub use collection::*;
 pub use source::*;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Article {
     pub source: ArticleSource,
     pub author: Option<String>,
     pub title: String,
-    // #[serde(default)]
     #[serde(deserialize_with = "deserialize_string")]
     pub description: String,
     #[serde(deserialize_with = "deserialize_string")]
     pub content: String,
     pub url: String,
-    #[serde(rename(deserialize = "urlToImage"))]
     pub url_to_image: Option<String>,
-    #[serde(rename(deserialize = "publishedAt"))]
     pub published_at: DateTime<Utc>,
 }
 

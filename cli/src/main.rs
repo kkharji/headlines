@@ -1,12 +1,15 @@
 use colour as c;
 use newsapp::api::NewsApi;
-use newsapp::{color_eyre_install, ArticleCollection, Result};
+use newsapp::{color_eyre_install, ArticleCollection, NewsApiCache, Result};
 
 fn main() -> Result<()> {
     color_eyre_install()?;
-    let articles = NewsApi::new().query(&["bitcoin"]).request()?;
+    let mut cache = NewsApiCache::default();
+    let articles = NewsApi::new(&mut cache).query(&["rust", "api"]).request()?;
 
     render(&articles);
+
+    cache.persist()?;
 
     Ok(())
 }

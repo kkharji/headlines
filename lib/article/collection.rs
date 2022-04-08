@@ -1,7 +1,7 @@
 use super::Article;
 use std::ops::Deref;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct ArticleCollection {
     pub articles: Vec<Article>,
 }
