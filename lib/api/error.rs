@@ -1,23 +1,17 @@
+use eyre::eyre;
 use serde::{Deserialize, Serialize};
-use std::fmt::Display;
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum ApiError {
-    ResponseError(String),
+    #[error("NewsApi: {0}")]
+    ResponseError(ApiResponseError),
+    #[error("Unexpected Error")]
+    EyreError(#[from] eyre::Error),
 }
 
-impl std::error::Error for ApiError {}
-
-impl Display for ApiError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ApiError::ResponseError(msg) => f.write_str(msg),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct NewsAPIErrorResponse {
+#[derive(Serialize, Deserialize, Debug, derive_more::Display)]
+#[display(fmt = "{}", message)]
+pub struct ApiResponseError {
     status: String,
     code: String,
     message: String,
@@ -25,20 +19,24 @@ pub struct NewsAPIErrorResponse {
 
 impl From<ureq::Error> for ApiError {
     fn from(error: ureq::Error) -> Self {
-        match error.into_response() {
-            None => Self::ResponseError("NewsApi: Request failed for unknown reason".into()),
-            Some(response) => {
-                let status = response.status();
-                let status_text = response.status_text().to_owned();
-                let base = format!("NewsApi ({}: {})", status, status_text);
-                match response.into_string() {
-                    Ok(res) => match serde_json::from_str::<NewsAPIErrorResponse>(&res) {
-                        Ok(err) => Self::ResponseError(format!("{base}: {:#?}", err)),
-                        Err(err) => Self::ResponseError(format!("{base}: {:#?}", err)),
-                    },
-                    Err(err) => Self::ResponseError(format!("{base} {:#?}", err)),
-                }
+        let response = match error.into_response() {
+            Some(response) => response,
+            None => return Self::EyreError(eyre!("NewsApi: Request failed for unknown reason")),
+        };
+
+        let message = format!("({}: {})", response.status(), response.status_text());
+
+        let resposne_string = match response.into_string() {
+            Ok(res) => res,
+            Err(e) => return Self::EyreError(eyre!("NewsApi {message}: ParseError {e}")),
+        };
+
+        match serde_json::from_str::<ApiResponseError>(&resposne_string) {
+            Ok(mut re) => {
+                re.message = format!("{message}: {}", re.message);
+                Self::ResponseError(re)
             }
+            Err(e) => Self::EyreError(eyre!("NewsApi {message}: ParseError {e}")),
         }
     }
 }
