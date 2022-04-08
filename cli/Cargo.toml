@@ -8,4 +8,3 @@ colour = "0.6.0"
 newsapp = { path = "../" }
 serde = {version = "1.0.136", features = ["derive"]}
 serde_json = "1.0.79"
-ureq = "2.4.0"
