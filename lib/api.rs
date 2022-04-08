@@ -60,7 +60,8 @@ mod tests {
     use chrono::{NaiveDate, Utc};
     #[test]
     fn request_without_query() {
-        let articles = NewsApi::default()
+        let mut cache = NewsApiCache::default();
+        let articles = NewsApi::new(&mut cache)
             .domains(&["techcrunch.com", "thenextweb.com"])
             .request()
             .unwrap();
@@ -68,27 +69,33 @@ mod tests {
         assert!(articles.iter().any(|a| {
             let name = a.source.name.as_str().to_lowercase();
             name == "techcrunch" || name == "thenextweb"
-        }))
+        }));
+        cache.persist().unwrap()
     }
 
     #[test]
     fn request_with_single_query() {
-        let articles = NewsApi::default().query(&["api"]).request().unwrap();
+        let mut cache = NewsApiCache::default();
+        let articles = NewsApi::new(&mut cache).query(&["api"]).request().unwrap();
         assert!(articles.iter().count() > 0);
+        cache.persist().unwrap();
     }
 
     #[test]
     fn request_with_multiple_queries() {
-        let articles = NewsApi::default()
+        let mut cache = NewsApiCache::default();
+        let articles = NewsApi::new(&mut cache)
             .query(&["api", "rust", "mac", "requestothing"])
             .request()
             .unwrap();
         assert!(articles.iter().count() == 0);
+        cache.persist().unwrap();
     }
 
     #[test]
     fn request_with_dates() {
-        let articles = NewsApi::default()
+        let mut cache = NewsApiCache::default();
+        let articles = NewsApi::new(&mut cache)
             .query(&["news"])
             .between(
                 Utc::now().date().naive_utc() - chrono::Duration::weeks(4),
@@ -97,11 +104,13 @@ mod tests {
             .request()
             .unwrap();
         assert_ne!(articles.iter().count(), 0);
+        cache.persist().unwrap();
     }
 
     #[test]
     fn request_with_old_dates() {
-        let response = NewsApi::default()
+        let mut cache = NewsApiCache::default();
+        let response = NewsApi::new(&mut cache)
             .query(&["news"])
             .between(
                 NaiveDate::from_ymd(2022, 01, 20),
@@ -114,6 +123,10 @@ mod tests {
             Ok(_) => panic!("Should have failed"),
             Err(e) => e,
         };
-        assert!(err.to_string().contains("429"))
+        assert!(err
+            .to_string()
+            .contains("NewsApi: (426: Upgrade Required):"));
+
+        cache.persist().unwrap();
     }
 }
