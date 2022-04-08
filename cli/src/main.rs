@@ -1,11 +1,14 @@
 use colour as c;
-use newsapp::api::NewsApi;
+use newsapp::api::{NewsApi, NewsApiEndpoint};
 use newsapp::{color_eyre_install, ArticleCollection, NewsApiCache, Result};
 
 fn main() -> Result<()> {
     color_eyre_install()?;
     let mut cache = NewsApiCache::default();
-    let articles = NewsApi::new(&mut cache).query(&["rust", "api"]).request()?;
+    let articles = NewsApi::new(&mut cache)
+        .query(&["rust", "api"])
+        .endpoint(NewsApiEndpoint::TopHeadlines)
+        .request()?;
 
     render(&articles);
 

@@ -64,7 +64,7 @@ impl<'cache> NewsApiBuilder<'cache> {
             request = request.query("q", self.query.unwrap().join(" ").as_str());
         }
 
-        if self.endpoint.is_top_headings()
+        if self.endpoint.is_top_headlines()
             && self.sources.as_ref().is_some()
             && (self.category.as_ref().is_some() || self.country.as_ref().is_some())
         {
@@ -194,6 +194,12 @@ impl<'cache> NewsApiBuilder<'cache> {
 
     pub fn cache(mut self, cache: &'cache mut NewsApiCache) -> Self {
         self.cache = Some(cache);
+        self
+    }
+
+    /// Set the news api builder's endpoint.
+    pub fn endpoint(mut self, endpoint: NewsApiEndpoint) -> Self {
+        self.endpoint = endpoint;
         self
     }
 }

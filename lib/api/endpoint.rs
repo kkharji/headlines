@@ -3,7 +3,8 @@ use strum::{AsRefStr, EnumString};
 #[strum(serialize_all = "snake_case")]
 pub enum NewsApiEndpoint {
     Everything,
-    TopHeadings,
+    #[strum(serialize = "top-headlines")]
+    TopHeadlines,
 }
 
 impl NewsApiEndpoint {
@@ -18,11 +19,11 @@ impl NewsApiEndpoint {
         matches!(self, Self::Everything)
     }
 
-    /// Returns `true` if the news api endpoint is [`TopHeadings`].
+    /// Returns `true` if the news api endpoint is [`TopHeadlins`].
     ///
     /// [`TopHeadings`]: NewsApiEndpoint::TopHeadings
-    pub fn is_top_headings(&self) -> bool {
-        matches!(self, Self::TopHeadings)
+    pub fn is_top_headlines(&self) -> bool {
+        matches!(self, Self::TopHeadlines)
     }
 }
 
@@ -55,21 +56,21 @@ mod tests {
     fn converts_with_into_string() {
         let everything: String = NewsApiEndpoint::Everything.into();
         assert_eq!("everything".to_string(), everything);
-        let top_headings: String = NewsApiEndpoint::TopHeadings.into();
-        assert_eq!("top_headings".to_string(), top_headings);
+        let top_headlines: String = NewsApiEndpoint::TopHeadlines.into();
+        assert_eq!("top-headlines".to_string(), top_headlines);
     }
 
     #[test]
     fn converts_with_to_string() {
         assert_eq!(
-            "top_headings".to_string(),
-            NewsApiEndpoint::TopHeadings.to_string()
+            "top-headlines".to_string(),
+            NewsApiEndpoint::TopHeadlines.to_string()
         )
     }
 
     #[test]
     fn converts_from_string() {
-        let scope = NewsApiEndpoint::try_from("top_headings").unwrap();
-        assert!(matches!(scope, NewsApiEndpoint::TopHeadings))
+        let scope = NewsApiEndpoint::try_from("top-headlines").unwrap();
+        assert!(matches!(scope, NewsApiEndpoint::TopHeadlines))
     }
 }
