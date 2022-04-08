@@ -382,8 +382,6 @@ version = "0.1.0"
 dependencies = [
  "colour",
  "newsapp",
- "serde",
- "serde_json",
 ]
 
 [[package]]
