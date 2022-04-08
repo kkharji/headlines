@@ -1,9 +1,11 @@
+mod category;
 mod collection;
 mod source;
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Deserializer, Serialize};
 
+pub use category::*;
 pub use collection::*;
 pub use source::*;
 

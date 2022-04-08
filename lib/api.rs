@@ -1,11 +1,9 @@
 mod builder;
-pub mod category;
 mod endpoint;
 mod error;
 mod search_scope;
 
 pub use builder::*;
-pub use category::*;
 pub use endpoint::*;
 pub use error::*;
 

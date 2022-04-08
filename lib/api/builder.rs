@@ -1,6 +1,5 @@
-use super::NewsApiCategory;
 use crate::api::{NewsApi, NewsApiEndpoint, NewsApiSearchScope};
-use crate::{ArticleCollection, NewsApiCache};
+use crate::{ArticleCategory, ArticleCollection, NewsApiCache};
 use chrono::NaiveDate;
 use color_eyre::Result;
 use eyre::{bail, ContextCompat};
@@ -25,7 +24,7 @@ pub struct NewsApiBuilder<'cache> {
     language: String,
     page_size: u32,
     page: u32,
-    category: Option<NewsApiCategory>,
+    category: Option<ArticleCategory>,
     country: Option<String>,
     cache: Option<&'cache mut NewsApiCache>,
 }

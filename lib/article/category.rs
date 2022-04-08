@@ -2,7 +2,7 @@ use strum::{AsRefStr, EnumString};
 
 #[derive(EnumString, AsRefStr, Debug)]
 #[strum(serialize_all = "lowercase")]
-pub enum NewsApiCategory {
+pub enum ArticleCategory {
     Entertainment,
     General,
     Health,
@@ -11,19 +11,19 @@ pub enum NewsApiCategory {
     Technology,
 }
 
-impl Into<String> for NewsApiCategory {
+impl Into<String> for ArticleCategory {
     fn into(self) -> String {
         self.as_ref().to_string()
     }
 }
 
-impl ToString for NewsApiCategory {
+impl ToString for ArticleCategory {
     fn to_string(&self) -> String {
         self.as_ref().into()
     }
 }
 
-impl TryFrom<String> for NewsApiCategory {
+impl TryFrom<String> for ArticleCategory {
     type Error = eyre::Error;
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
@@ -36,12 +36,12 @@ impl TryFrom<String> for NewsApiCategory {
 #[cfg(test)]
 mod tests {
 
-    use crate::api::NewsApiCategory;
+    use crate::ArticleCategory;
 
     #[test]
     fn to_string() {
-        assert_eq!(NewsApiCategory::Entertainment.as_ref(), "entertainment");
-        assert_eq!(NewsApiCategory::Sports.as_ref(), "sports");
+        assert_eq!(ArticleCategory::Entertainment.as_ref(), "entertainment");
+        assert_eq!(ArticleCategory::Sports.as_ref(), "sports");
     }
 
     #[test]
@@ -49,16 +49,16 @@ mod tests {
         use std::str::FromStr;
 
         assert!(matches!(
-            NewsApiCategory::from_str("entertainment").unwrap(),
-            NewsApiCategory::Entertainment
+            ArticleCategory::from_str("entertainment").unwrap(),
+            ArticleCategory::Entertainment
         ));
 
         assert!(matches!(
-            NewsApiCategory::from_str("sports").unwrap(),
-            NewsApiCategory::Sports
+            ArticleCategory::from_str("sports").unwrap(),
+            ArticleCategory::Sports
         ));
 
-        let cat: NewsApiCategory = "sports".try_into().unwrap();
-        assert!(matches!(cat, NewsApiCategory::Sports));
+        let cat: ArticleCategory = "sports".try_into().unwrap();
+        assert!(matches!(cat, ArticleCategory::Sports));
     }
 }
