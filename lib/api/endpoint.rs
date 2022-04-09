@@ -7,6 +7,12 @@ pub enum NewsApiEndpoint {
     TopHeadlines,
 }
 
+impl Default for NewsApiEndpoint {
+    fn default() -> Self {
+        NewsApiEndpoint::Everything
+    }
+}
+
 impl NewsApiEndpoint {
     pub fn inject_url(&self, url: &str) -> String {
         format!("{url}/{}", self.as_ref())

@@ -1,24 +1,25 @@
-use eyre::eyre;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, thiserror::Error)]
-pub enum ApiError {
+pub enum NewsApiError {
     #[error("NewsApi: {0}")]
-    ResponseError(ApiResponseError),
+    ResponseError(NewsApiResponseError),
     #[error("Unexpected Error")]
     EyreError(#[from] eyre::Error),
 }
 
 #[derive(Serialize, Deserialize, Debug, derive_more::Display)]
 #[display(fmt = "{}", message)]
-pub struct ApiResponseError {
+pub struct NewsApiResponseError {
     status: String,
     code: String,
     message: String,
 }
 
-impl From<ureq::Error> for ApiError {
+#[cfg(feature = "net_block")]
+impl From<ureq::Error> for NewsApiError {
     fn from(error: ureq::Error) -> Self {
+        use eyre::eyre;
         let response = match error.into_response() {
             Some(response) => response,
             None => return Self::EyreError(eyre!("NewsApi: Request failed for unknown reason")),
@@ -31,7 +32,26 @@ impl From<ureq::Error> for ApiError {
             Err(e) => return Self::EyreError(eyre!("NewsApi {message}: ParseError {e}")),
         };
 
-        match serde_json::from_str::<ApiResponseError>(&resposne_string) {
+        match serde_json::from_str::<NewsApiResponseError>(&resposne_string) {
+            Ok(mut re) => {
+                re.message = format!("{message}: {}", re.message);
+                Self::ResponseError(re)
+            }
+            Err(e) => Self::EyreError(eyre!("NewsApi {message}: ParseError {e}")),
+        }
+    }
+}
+
+#[cfg(feature = "net_async")]
+impl From<(String, reqwest::Response)> for NewsApiError {
+    fn from(response: (String, reqwest::Response)) -> Self {
+        use eyre::eyre;
+
+        let message = format!("({})", response.1.status());
+
+        let resposne_string = response.0;
+
+        match serde_json::from_str::<NewsApiResponseError>(&resposne_string) {
             Ok(mut re) => {
                 re.message = format!("{message}: {}", re.message);
                 Self::ResponseError(re)

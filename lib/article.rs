@@ -1,5 +1,7 @@
 mod category;
 mod collection;
+mod language;
+mod scope;
 mod source;
 
 use chrono::{DateTime, Utc};
@@ -7,6 +9,8 @@ use serde::{Deserialize, Deserializer, Serialize};
 
 pub use category::*;
 pub use collection::*;
+pub use language::*;
+pub use scope::*;
 pub use source::*;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -14,14 +14,32 @@ name = "newsapp"
 path = "lib/newsapp.rs"
 
 [dependencies]
-serde = {version = "1.0.136", features = ["derive"]}
-serde_json = "1.0.79"
 eyre = "0.6.8"
 color-eyre = "0.6.1"
-ureq = "2.4.0"
-chrono = { version = "0.4.19",  features = [ "serde" ] }
+
+serde_json = "1.0.79"
 thiserror = "1.0.30"
 derive_more = "0.99.17"
-strum = {version = "0.24.0", features = ["derive"]}
-redis = "0.21.5"
 lazy_static = "1.4.0"
+
+serde   = { version = "1.0.136", features = ["derive"] }
+chrono  = { version = "0.4.19",  features = ["serde"]  }
+strum   = { version = "0.24.0",  features = ["derive"] }
+ureq    = { version = "2.4.0", optional = true }
+redis   = { version = "0.21.5", optional = true }
+reqwest = { version = "0.11.10", features = ["json"], optional = true }
+
+[dev-dependencies]
+tokio = { version = "1.17.0", features = ["full"]  }
+
+[features]
+default = [ "cache", "net_async" ]
+net_async = [
+  "reqwest"
+]
+cache = [
+  "redis"
+]
+net_block = [
+  "ureq"
+]

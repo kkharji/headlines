@@ -1,130 +1,185 @@
-mod builder;
 mod endpoint;
 mod error;
-mod search_scope;
+mod macros;
+mod request;
+#[cfg(test)]
+mod tests;
 
-pub use builder::*;
 pub use endpoint::*;
 pub use error::*;
 
-use crate::{ArticleCollection, NewsApiCache};
-use eyre::{Result, WrapErr};
-use search_scope::NewsApiSearchScope;
-use ureq::Request;
+pub(crate) static BASEURL: &str = "https://newsapi.org/v2";
+pub(crate) static APIKEY: &str = env!("NEWSAPI_APIKEY");
 
-lazy_static::lazy_static! {
-    static ref CACHE: NewsApiCache = NewsApiCache::default();
+use crate::cache::NewsApiCache;
+use crate::{ArticleCategory, ArticleCollection, ArticleLanguage, ArticleSearchScope, Result};
+use chrono::NaiveDate;
+
+#[derive(Default)]
+pub struct NewsApi {
+    #[cfg(feature = "cache")]
+    pub cache: NewsApiCache,
+    pub endpoint: NewsApiEndpoint,
+    pub language: ArticleLanguage,
+    pub page_size: u32,
+    pub page: u32,
+    pub query: Option<Vec<String>>,
+    pub searchin: Option<Vec<ArticleSearchScope>>,
+    pub sources: Option<Vec<String>>,
+    pub domains: Option<Vec<String>>,
+    pub exclude_domains: Option<Vec<String>>,
+    pub from: Option<NaiveDate>,
+    pub upto: Option<NaiveDate>,
+    pub category: Option<ArticleCategory>,
+    pub country: Option<String>,
 }
 
-pub struct NewsApi<'cache> {
-    request: Request,
-    cache: Option<&'cache mut NewsApiCache>,
-}
+impl NewsApi {
+    #[cfg(all(feature = "net_async", not(feature = "net_block")))]
 
-impl<'cache> NewsApi<'cache> {
-    pub fn new(cache: &mut NewsApiCache) -> NewsApiBuilder {
-        NewsApiBuilder::default().cache(cache)
-    }
+    pub async fn request(mut self) -> Result<ArticleCollection> {
+        let client = reqwest::Client::new();
+        let request = request::build(&self, client.get(self.url()))?.build()?;
 
-    pub fn default() -> NewsApiBuilder<'cache> {
-        NewsApiBuilder::default()
-    }
+        #[cfg(feature = "cache")]
+        let url = request.url().to_string();
 
-    pub fn request(self) -> Result<ArticleCollection> {
-        let url = self.request.url().to_string();
-        if let Some(ref cache) = self.cache {
-            if let Some(result) = cache.get(&url) {
-                println!("From CACHE ....");
-                return Ok(result.clone());
-            };
+        #[cfg(feature = "cache")]
+        if let Ok(value) = self.cache.get(&url) {
+            return Ok(value);
         };
 
-        let response = self.request.call().map_err(ApiError::from)?;
-        let string = response.into_string()?;
-        let result: ArticleCollection = serde_json::from_str(&string)
-            .context(format!("NewsApi Response Serialization: {}", string))?;
+        let response = client.execute(request).await?;
 
-        if let Some(cache) = self.cache {
-            cache.insert(url.to_string(), result.clone());
-        }
+        let result: ArticleCollection = if response.status() != 200 {
+            let err = response.json::<NewsApiResponseError>().await?;
+            return Err(NewsApiError::ResponseError(err).into());
+        } else {
+            response.json().await?
+        };
+
+        #[cfg(feature = "cache")]
+        self.cache.update(url, result.clone())?;
 
         Ok(result)
     }
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use chrono::{NaiveDate, Utc};
-    #[test]
-    fn request_without_query() {
-        let mut cache = NewsApiCache::default();
-        let articles = NewsApi::new(&mut cache)
-            .domains(&["techcrunch.com", "thenextweb.com"])
-            .request()
-            .unwrap();
+    #[cfg(all(feature = "net_block", not(feature = "net_async")))]
+    pub fn request(mut self) -> Result<ArticleCollection> {
+        let request = request::build(&self, ureq::get(&self.url()))?;
 
-        assert!(articles.iter().any(|a| {
-            let name = a.source.name.as_str().to_lowercase();
-            name == "techcrunch" || name == "thenextweb"
-        }));
-        cache.persist().unwrap()
-    }
+        #[cfg(feature = "cache")]
+        let url = request.url().to_string();
 
-    #[test]
-    fn request_with_single_query() {
-        let mut cache = NewsApiCache::default();
-        let articles = NewsApi::new(&mut cache).query(&["api"]).request().unwrap();
-        assert!(articles.iter().count() > 0);
-        cache.persist().unwrap();
-    }
-
-    #[test]
-    fn request_with_multiple_queries() {
-        let mut cache = NewsApiCache::default();
-        let articles = NewsApi::new(&mut cache)
-            .query(&["api", "rust", "mac", "requestothing"])
-            .request()
-            .unwrap();
-        assert!(articles.iter().count() == 0);
-        cache.persist().unwrap();
-    }
-
-    #[test]
-    fn request_with_dates() {
-        let mut cache = NewsApiCache::default();
-        let articles = NewsApi::new(&mut cache)
-            .query(&["news"])
-            .between(
-                Utc::now().date().naive_utc() - chrono::Duration::weeks(4),
-                Utc::now().date().naive_utc(),
-            )
-            .request()
-            .unwrap();
-        assert_ne!(articles.iter().count(), 0);
-        cache.persist().unwrap();
-    }
-
-    #[test]
-    fn request_with_old_dates() {
-        let mut cache = NewsApiCache::default();
-        let response = NewsApi::new(&mut cache)
-            .query(&["news"])
-            .between(
-                NaiveDate::from_ymd(2022, 01, 20),
-                Utc::now().date().naive_utc(),
-            )
-            .request();
-
-        assert!(response.is_err());
-        let err = match response {
-            Ok(_) => panic!("Should have failed"),
-            Err(e) => e,
+        dbg!(&url);
+        #[cfg(feature = "cache")]
+        if let Ok(value) = self.cache.get(&url) {
+            return Ok(value);
         };
-        assert!(err
-            .to_string()
-            .contains("NewsApi: (426: Upgrade Required):"));
 
-        cache.persist().unwrap();
+        let response = request.call().map_err(NewsApiError::from)?;
+        let string = response.into_string()?;
+        let result: ArticleCollection = eyre::Context::context(
+            serde_json::from_str(&string),
+            format!("NewsApi Response Serialization: {}", string),
+        )?;
+
+        #[cfg(feature = "cache")]
+        self.cache.update(url, result.clone())?;
+
+        Ok(result)
+    }
+
+    /// Get Request url
+    fn url(&self) -> String {
+        self.endpoint.inject_url(BASEURL)
+    }
+
+    /// Set the NewsApi builder's searchin.
+    pub fn searchin(mut self, searchin: &[ArticleSearchScope]) -> Self {
+        self.searchin = Some(searchin.to_vec());
+        self
+    }
+
+    /// Set the NewsApi builder's sources.
+    pub fn sources(mut self, sources: &[&str]) -> Self {
+        self.sources = Some(
+            sources
+                .into_iter()
+                .map(ToString::to_string)
+                .collect::<Vec<_>>(),
+        );
+        self
+    }
+
+    /// Set the NewsApi builder's domains.
+    pub fn domains(mut self, domains: &[&str]) -> Self {
+        self.domains = Some(
+            domains
+                .into_iter()
+                .map(ToString::to_string)
+                .collect::<Vec<_>>(),
+        );
+        self
+    }
+
+    /// Set the NewsApi builder's exclude domains.
+    pub fn exclude_domains(mut self, exclude_domains: &[&str]) -> Self {
+        let value = exclude_domains
+            .into_iter()
+            .map(ToString::to_string)
+            .collect::<Vec<_>>();
+        self.exclude_domains = Some(value);
+        self
+    }
+
+    /// Set the NewsApi builder's from.
+    pub fn from(mut self, from: NaiveDate) -> Self {
+        self.from = Some(from);
+        self
+    }
+
+    /// Set the NewsApi builder's to.
+    pub fn upto(mut self, to: NaiveDate) -> Self {
+        self.upto = Some(to);
+        self
+    }
+
+    /// Set the NewsApi builder's language.
+    pub fn language(mut self, language: ArticleLanguage) -> Self {
+        self.language = language.into();
+        self
+    }
+
+    /// Set the news api builder's page.
+    pub fn page(mut self, page: u32) -> Self {
+        self.page = page;
+        self
+    }
+
+    /// Set the news api builder's page size.
+    pub fn page_size(mut self, page_size: u32) -> Self {
+        self.page_size = page_size;
+        self
+    }
+
+    /// Set the news api builder's query.
+    pub fn query(mut self, query: &[&str]) -> Self {
+        let value = query
+            .into_iter()
+            .map(ToString::to_string)
+            .collect::<Vec<_>>();
+        self.query = Some(value);
+        self
+    }
+
+    pub fn between(self, from: NaiveDate, to: NaiveDate) -> Self {
+        self.from(from).upto(to)
+    }
+
+    /// Set the news api builder's endpoint.
+    pub fn endpoint(mut self, endpoint: NewsApiEndpoint) -> Self {
+        self.endpoint = endpoint;
+        self
     }
 }

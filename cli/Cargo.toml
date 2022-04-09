@@ -6,3 +6,19 @@ edition = "2021"
 [dependencies]
 colour = "0.6.0"
 newsapp = { path = "../" }
+tokio = { version = "1.17.0", features = ["full"], optional = true }
+
+
+[features]
+default = [ "tokio" ]
+# cache = [
+#   "newsapp/cache"
+# ]
+# net_block = [
+#   "newsapp/net_block"
+# ]
+# net_async = [
+#   "newsapp/net_async",
+#   "tokio"
+# ]
+

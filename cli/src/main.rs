@@ -1,18 +1,16 @@
 use colour as c;
-use newsapp::api::{NewsApi, NewsApiEndpoint};
-use newsapp::{color_eyre_install, ArticleCollection, NewsApiCache, Result};
+use newsapp::{color_eyre_install, ArticleCollection, NewsApi, NewsApiEndpoint, Result};
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     color_eyre_install()?;
-    let mut cache = NewsApiCache::default();
-    let articles = NewsApi::new(&mut cache)
-        .query(&["rust", "api"])
+    let articles = NewsApi::default()
+        .query(&["youtube"])
         .endpoint(NewsApiEndpoint::TopHeadlines)
-        .request()?;
+        .request()
+        .await?;
 
     render(&articles);
-
-    cache.persist()?;
 
     Ok(())
 }

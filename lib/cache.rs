@@ -1,9 +1,10 @@
 //! Simple cache so we don't consume all the request allowed for free accounts.
+//! Requires `cache` feature
 use crate::ArticleCollection;
 use color_eyre::Result;
+use eyre::bail;
 use redis::Commands;
 use std::collections::HashMap;
-use std::ops::{Deref, DerefMut};
 
 pub struct NewsApiCache {
     cache: HashMap<String, ArticleCollection>,
@@ -38,24 +39,23 @@ impl NewsApiCache {
 
         Ok(())
     }
+    pub fn get(&self, url: &str) -> Result<ArticleCollection> {
+        if let Some(result) = self.cache.get(url) {
+            println!("From CACHE ....");
+            return Ok(result.clone());
+        }
+        bail!("No cache for {url}")
+    }
+
+    pub fn update(&mut self, url: String, data: ArticleCollection) -> Result<()> {
+        self.cache.insert(url, data);
+        self.persist()?;
+        Ok(())
+    }
 
     pub fn persist(&self) -> Result<()> {
         let mut conn = self.client.get_connection()?;
         let _: () = conn.set(Self::KEY, serde_json::to_string(&self.cache)?)?;
         Ok(())
-    }
-}
-
-impl Deref for NewsApiCache {
-    type Target = HashMap<String, ArticleCollection>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.cache
-    }
-}
-
-impl DerefMut for NewsApiCache {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.cache
     }
 }
