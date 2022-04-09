@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+chrono = "0.4.19"
 colour = "0.6.0"
 newsapp = { path = "../" }
 tokio = { version = "1.17.0", features = ["full"], optional = true }

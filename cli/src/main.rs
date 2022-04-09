@@ -1,14 +1,10 @@
 use colour as c;
-use newsapp::{color_eyre_install, ArticleCollection, NewsApi, NewsApiEndpoint, Result};
+use newsapp::{color_eyre_install, ArticleCollection, NewsApi, Result};
 
 #[tokio::main]
 async fn main() -> Result<()> {
     color_eyre_install()?;
-    let articles = NewsApi::default()
-        .query(&["youtube"])
-        .endpoint(NewsApiEndpoint::TopHeadlines)
-        .request()
-        .await?;
+    let articles = NewsApi::default().request_from_cache().await?;
 
     render(&articles);
 

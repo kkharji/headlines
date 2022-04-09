@@ -633,6 +633,7 @@ dependencies = [
 name = "newsapi_cli"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "colour",
  "newsapp",
  "tokio",

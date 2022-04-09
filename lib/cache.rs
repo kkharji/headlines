@@ -47,6 +47,14 @@ impl NewsApiCache {
         bail!("No cache for {url}")
     }
 
+    pub fn all(&self) -> ArticleCollection {
+        let mut articles = vec![];
+        for a in self.cache.values() {
+            articles.append(&mut a.articles.clone())
+        }
+        ArticleCollection { articles }
+    }
+
     pub fn update(&mut self, url: String, data: ArticleCollection) -> Result<()> {
         self.cache.insert(url, data);
         self.persist()?;

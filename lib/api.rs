@@ -36,7 +36,13 @@ pub struct NewsApi {
 
 impl NewsApi {
     #[cfg(all(feature = "net_async", not(feature = "net_block")))]
+    pub async fn request_from_cache(&self) -> Result<ArticleCollection> {
+        Ok(self.cache.all())
+    }
+    #[cfg(all(feature = "net_block", not(feature = "net_async")))]
+    pub fn request_from_cache(mut self) -> Result<ArticleCollection> {}
 
+    #[cfg(all(feature = "net_async", not(feature = "net_block")))]
     pub async fn request(mut self) -> Result<ArticleCollection> {
         let client = reqwest::Client::new();
         let request = request::build(&self, client.get(self.url()))?.build()?;
