@@ -1,8 +1,7 @@
 //! Simple cache so we don't consume all the request allowed for free accounts.
 //! Requires `cache` feature
 use crate::ArticleCollection;
-use color_eyre::Result;
-use eyre::bail;
+use eyre::{bail, Result};
 use redis::Commands;
 use std::collections::HashMap;
 

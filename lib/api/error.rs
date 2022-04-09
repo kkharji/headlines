@@ -3,14 +3,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, thiserror::Error)]
 pub enum NewsApiError {
     #[error("NewsApi: {0}")]
-    ResponseError(NewsApiResponseError),
+    ResponseError(NewsApiErrorResponse),
     #[error("Unexpected Error")]
     EyreError(#[from] eyre::Error),
 }
 
 #[derive(Serialize, Deserialize, Debug, derive_more::Display)]
 #[display(fmt = "{}", message)]
-pub struct NewsApiResponseError {
+pub struct NewsApiErrorResponse {
     status: String,
     code: String,
     message: String,
@@ -32,7 +32,7 @@ impl From<ureq::Error> for NewsApiError {
             Err(e) => return Self::EyreError(eyre!("NewsApi {message}: ParseError {e}")),
         };
 
-        match serde_json::from_str::<NewsApiResponseError>(&resposne_string) {
+        match serde_json::from_str::<NewsApiErrorResponse>(&resposne_string) {
             Ok(mut re) => {
                 re.message = format!("{message}: {}", re.message);
                 Self::ResponseError(re)
@@ -51,7 +51,7 @@ impl From<(String, reqwest::Response)> for NewsApiError {
 
         let resposne_string = response.0;
 
-        match serde_json::from_str::<NewsApiResponseError>(&resposne_string) {
+        match serde_json::from_str::<NewsApiErrorResponse>(&resposne_string) {
             Ok(mut re) => {
                 re.message = format!("{message}: {}", re.message);
                 Self::ResponseError(re)

@@ -1,4 +1,5 @@
 use super::*;
+use crate::ArticleCollection;
 use chrono::{NaiveDate, Utc};
 
 fn with_domains_builder() -> NewsApi {
