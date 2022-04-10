@@ -1577,7 +1577,6 @@ dependencies = [
  "clap",
  "colour",
  "newsapp",
- "tokio",
 ]
 
 [[package]]
@@ -1608,7 +1607,7 @@ dependencies = [
  "newsapp",
  "poll-promise",
  "serde",
- "tokio",
+ "strum",
  "tracing",
  "tracing-subscriber",
 ]
@@ -1914,7 +1913,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "260817b339544e5b23d4bb66d4522d89dd64af88d16b6dcd7b2a2409ee2e095d"
 dependencies = [
  "static_assertions",
- "tokio",
 ]
 
 [[package]]

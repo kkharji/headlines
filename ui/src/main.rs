@@ -10,8 +10,7 @@ mod pages;
 mod route;
 mod state;
 
-#[tokio::main]
-async fn main() {
+fn main() {
     tracing_subscriber::fmt().init();
     #[allow(unused_mut)]
     let mut options = NativeOptions::default();

@@ -12,10 +12,9 @@ fn render(articles: &ArticleCollection) {
     }
 }
 
-#[tokio::main]
-async fn main() -> Result<()> {
+fn main() -> Result<()> {
     let api = NewsApi::parse();
-    let articles = api.request().await?;
+    let articles = api.request()?;
     render(&articles);
     Ok(())
 }

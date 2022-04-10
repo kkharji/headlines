@@ -50,7 +50,7 @@ impl NewsApi {
 #[cfg(all(feature = "net_block", not(feature = "net_async")))]
 impl NewsApi {
     #[cfg(feature = "cache")]
-    pub fn request_from_cache(mut self) -> Result<ArticleCollection> {
+    pub fn request_from_cache(self) -> Result<ArticleCollection> {
         Ok(NewsApiCache::default().all())
     }
 

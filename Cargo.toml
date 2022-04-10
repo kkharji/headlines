@@ -34,7 +34,7 @@ clap    = { version = "3.1.8", features = ["derive"], optional = true }
 tokio = { version = "1.17.0", features = ["full"]  }
 
 [features]
-default = [ "cache", "net_async" ]
+default = [ "cache", "net_block" ]
 net_async = [ "reqwest" ]
 cache = [ "redis" ]
 net_block = [ "ureq" ]
