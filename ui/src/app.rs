@@ -3,6 +3,7 @@ use super::state::State;
 use crate::pages;
 use crate::state::Page;
 use eframe::egui::{CentralPanel, Context, Visuals};
+
 use eframe::epi::{self, Frame};
 
 #[derive(Default)]
@@ -23,7 +24,11 @@ impl epi::App for App {
             // header(ui, "Headlines");
             match self.state.current_page {
                 Page::Headlines => pages::headlines(ui, &mut self.state),
-                Page::Search => {}
+                Page::Search => {
+                    ui.centered_and_justified(|ui| {
+                        ui.heading("Someday");
+                    });
+                }
                 Page::Home => {}
             }
             footer(ctx);

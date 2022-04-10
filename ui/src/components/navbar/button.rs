@@ -1,15 +1,18 @@
 use crate::macros::Button;
 use crate::state::{Page, State};
-use eframe::egui::TextStyle::Body;
+use eframe::egui::TextStyle::{self, Body};
 use eframe::egui::{RichText, Ui};
 use eframe::epi::Frame;
 
 /// Generic navbar page button
 pub fn page(page: Page, state: &mut State, ui: &mut Ui) {
-    let mut label = RichText::new(page.as_ref()).heading();
+    let text_style = TextStyle::Name("NavPageLink".into());
+    let mut label = RichText::new(page.as_ref()).text_style(text_style);
+
     if page == state.current_page {
         label = label.strong();
     }
+
     if ui.button(label).clicked() {
         state.set_current_page(page);
     };

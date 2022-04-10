@@ -6,11 +6,14 @@ use eframe::epaint::Vec2;
 use newsapp::Article;
 
 pub fn article_card(ui: &mut Ui, article: &Article) {
+    let heading = RichText::new(format!("▶ {}", article.title))
+        .heading()
+        .strong();
     ui.add_space(PADDING);
-    ui.colored_label(WHITE, format!("▶ {}", article.title));
+    ui.colored_label(WHITE, heading);
     ui.add_space(PADDING);
 
-    let text = RichText::new(&article.description).text_style(TextStyle::Button);
+    let text = RichText::new(&article.description).text_style(TextStyle::Body);
 
     ui.label(text);
     // TODO: move to style.rs

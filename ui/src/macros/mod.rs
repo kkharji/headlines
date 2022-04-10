@@ -18,7 +18,7 @@ macro_rules! Space {
 }
 
 macro_rules! Label {
-    (text: $text:expr, style: $style:ident, $ui:ident) => {
+    (text: $text:expr, style: $style:expr, $ui:ident) => {
         $ui.label(RichText::new($text).text_style($style))
     };
 }

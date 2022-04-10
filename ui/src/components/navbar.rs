@@ -3,8 +3,7 @@ use crate::macros::*;
 use crate::state::Page::{Headlines, Search};
 use crate::state::State;
 use button::*;
-use eframe::egui::TextStyle::Body;
-use eframe::egui::{menu, Context, Layout, RichText, TopBottomPanel};
+use eframe::egui::{menu, Context, Layout, RichText, TextStyle, TopBottomPanel};
 use eframe::epi::Frame;
 
 pub fn navbar(ctx: &Context, frame: &Frame, state: &mut State) {
@@ -12,7 +11,7 @@ pub fn navbar(ctx: &Context, frame: &Frame, state: &mut State) {
         Space!(ui);
         menu::bar(ui, |ui| {
             Layout!(ui, left_to_right, |ui| {
-                Label!(text: "📓", style: Body, ui)
+                Label!(text: "📓", style: TextStyle::Name("NavPageLink".into()), ui)
             });
             Layout!(ui, left_to_right, |ui| {
                 ui.add_space(5.);

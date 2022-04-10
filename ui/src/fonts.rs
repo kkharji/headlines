@@ -29,11 +29,14 @@ fn configure_text_styles(ctx: &Context) {
     let mut style = (*ctx.style()).clone();
     // Note: Set the size of different text styles.
     style.text_styles = [
+        (TextStyle::Name("NavPageLink".into()), {
+            FontId::new(25.0, FontFamily::Proportional)
+        }),
         (TextStyle::Heading, {
-            FontId::new(35.0, FontFamily::Proportional)
+            FontId::new(23.0, FontFamily::Proportional)
         }),
         (TextStyle::Body, {
-            FontId::new(20.0, FontFamily::Proportional)
+            FontId::new(18.0, FontFamily::Proportional)
         }),
         (TextStyle::Monospace, {
             FontId::new(14.0, FontFamily::Monospace)
