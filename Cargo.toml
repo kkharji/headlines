@@ -6,7 +6,8 @@ edition = "2021"
 [workspace] 
 
 members = [
-  "cli"
+  "cli",
+  "ui"
 ]
 
 [lib]
@@ -33,7 +34,7 @@ clap    = { version = "3.1.8", features = ["derive"], optional = true }
 tokio = { version = "1.17.0", features = ["full"]  }
 
 [features]
-default = [ "cache", "net_async", "derive_clap" ]
+default = [ "cache", "net_async" ]
 net_async = [ "reqwest" ]
 cache = [ "redis" ]
 net_block = [ "ureq" ]
