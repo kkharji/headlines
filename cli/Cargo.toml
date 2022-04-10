@@ -7,17 +7,4 @@ edition = "2021"
 chrono = "0.4.19"
 clap = { version = "3.1.8", features = ["derive"] }
 colour = "0.6.0"
-newsapp = { path = "../", features = ["derive_clap", "cache"] }
-
-
-# cache = [
-#   "newsapp/cache"
-# ]
-# net_block = [
-#   "newsapp/net_block"
-# ]
-# net_async = [
-#   "newsapp/net_async",
-#   "tokio"
-# ]
-
+newsapp = { path = "../", features = ["derive_clap", "cache", "net_block"] }

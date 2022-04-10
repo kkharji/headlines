@@ -52,40 +52,44 @@ fn assert_require_payment(response: eyre::Result<ArticleCollection>) {
     assert!(err.to_string().contains("upgrade"));
 }
 
-#[cfg(all(feature = "net_async", not(feature = "net_block")))]
+#[cfg(feature = "net_async")]
 mod net_async {
     use super::*;
 
     #[tokio::test]
     async fn with_domains_only() {
-        assert_with_domains_builder(with_domains_builder().request().await.unwrap());
+        assert_with_domains_builder(with_domains_builder().request_async().await.unwrap());
     }
 
     #[tokio::test]
     async fn with_single_query() {
-        assert_has_results(with_single_query_builder().request().await.unwrap());
+        assert_has_results(with_single_query_builder().request_async().await.unwrap());
     }
 
     #[tokio::test]
     async fn with_multiple_queries() {
-        assert_no_results(with_mutliple_queries_builder().request().await.unwrap());
+        assert_no_results(
+            with_mutliple_queries_builder()
+                .request_async()
+                .await
+                .unwrap(),
+        );
     }
 
     #[tokio::test]
     async fn with_dates() {
-        assert_has_results(between_dates_free_builder().request().await.unwrap());
+        assert_has_results(between_dates_free_builder().request_async().await.unwrap());
     }
 
     #[tokio::test]
     async fn with_old_dates() {
-        assert_require_payment(between_dates_paid_builder().request().await)
+        assert_require_payment(between_dates_paid_builder().request_async().await)
     }
 }
 
-#[cfg(all(feature = "net_block", not(feature = "net_async")))]
+#[cfg(feature = "net_block")]
 mod net_block {
     use super::*;
-    use chrono::{NaiveDate, Utc};
     #[test]
     fn with_domains_only() {
         assert_with_domains_builder(with_domains_builder().request().unwrap());

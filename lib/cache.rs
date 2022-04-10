@@ -1,6 +1,6 @@
 //! Simple cache so we don't consume all the request allowed for free accounts.
 //! Requires `cache` feature
-use crate::ArticleCollection;
+use crate::{ArticleCollection, NewsApi};
 use eyre::{bail, Result};
 use redis::Commands;
 use std::collections::HashMap;
@@ -65,4 +65,25 @@ impl NewsApiCache {
         let _: () = conn.set(Self::KEY, serde_json::to_string(&self.cache)?)?;
         Ok(())
     }
+}
+
+impl NewsApi {
+    #[cfg(feature = "net_async")]
+    pub async fn request_from_cache_async(&self) -> Result<ArticleCollection> {
+        Ok(NewsApiCache::default().all())
+    }
+
+    pub(crate) fn try_from_cache(&self, url: &str) -> (NewsApiCache, Result<ArticleCollection>) {
+        let cache = NewsApiCache::default();
+        if let Ok(value) = cache.get(&url) {
+            return (cache, Ok(value));
+        }
+        (cache, Err(eyre::eyre!("No Results from cache")))
+    }
+
+    #[cfg(feature = "net_block")]
+    pub fn request_from_cache(self) -> Result<ArticleCollection> {
+        Ok(NewsApiCache::default().all())
+    }
+
 }
