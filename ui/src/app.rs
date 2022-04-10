@@ -19,11 +19,12 @@ impl epi::App for App {
     // Lifecycle method. Called a LOT
     fn update(&mut self, ctx: &Context, frame: &Frame) {
         self.update_theme(ctx);
-
         navbar(ctx, frame, &mut self.state);
-        footer(ctx);
 
-        CentralPanel::default().show(ctx, |ui| Route::update(ui, &mut self.state));
+        CentralPanel::default().show(ctx, |ui| {
+            Route::update(ui, &mut self.state);
+            footer(ctx);
+        });
     }
 
     // Lifecycle method. Called one time. best for preloading or configuration of the app.
