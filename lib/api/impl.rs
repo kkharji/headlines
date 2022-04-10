@@ -65,4 +65,17 @@ impl NewsApi {
 
         Ok(result)
     }
+
+    #[cfg(feature = "egui")]
+    pub fn request_promise(
+        self,
+        ctx: &eframe::egui::Context,
+    ) -> poll_promise::Promise<Result<ArticleCollection>> {
+        let ctx = ctx.clone();
+        poll_promise::Promise::spawn_thread("newsapi", move || {
+            let articles = self.request()?;
+            ctx.request_repaint();
+            Ok(articles)
+        })
+    }
 }

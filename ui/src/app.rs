@@ -1,10 +1,9 @@
 use super::components::*;
 use super::state::State;
-use crate::route::Route;
+use crate::pages;
+use crate::state::Page;
 use eframe::egui::{CentralPanel, Context, Visuals};
 use eframe::epi::{self, Frame};
-use newsapp::{ArticleCollection, NewsApi};
-use poll_promise::Promise;
 
 #[derive(Default)]
 pub struct App {
@@ -20,9 +19,13 @@ impl epi::App for App {
     fn update(&mut self, ctx: &Context, frame: &Frame) {
         self.update_theme(ctx);
         navbar(ctx, frame, &mut self.state);
-
         CentralPanel::default().show(ctx, |ui| {
-            Route::update(ui, &mut self.state);
+            // header(ui, "Headlines");
+            match self.state.current_page {
+                Page::Headlines => pages::headlines(ui, &mut self.state),
+                Page::Search => {}
+                Page::Home => {}
+            }
             footer(ctx);
         });
     }
@@ -30,23 +33,8 @@ impl epi::App for App {
     // Lifecycle method. Called one time. best for preloading or configuration of the app.
     fn setup(&mut self, ctx: &Context, _frame: &Frame, _storage: Option<&dyn epi::Storage>) {
         crate::fonts::configure(ctx);
-
         // TODO: figure out a way to make real requests and make triggered by action.
-        self.state.articles_mut().get_or_insert_with(|| {
-            let ctx = ctx.clone();
-            Promise::spawn_async(async move {
-                match NewsApi::default().request_from_cache().await {
-                    Ok(articles) => {
-                        ctx.request_repaint();
-                        articles
-                    }
-                    Err(err) => {
-                        tracing::error!("Fail to fetch articles {err}");
-                        ArticleCollection::default()
-                    }
-                }
-            })
-        });
+        let _ = self.state.articles(ctx);
     }
 }
 

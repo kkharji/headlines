@@ -86,4 +86,17 @@ impl NewsApi {
         Ok(NewsApiCache::default().all())
     }
 
+    #[cfg(feature = "egui")]
+    pub fn request_from_cache_promise(
+        self,
+        ctx: &eframe::egui::Context,
+    ) -> poll_promise::Promise<Result<ArticleCollection>> {
+        let ctx = ctx.clone();
+
+        poll_promise::Promise::spawn_thread("newsapi", move || {
+            let articles = self.request_from_cache()?;
+            ctx.request_repaint();
+            Ok(articles)
+        })
+    }
 }

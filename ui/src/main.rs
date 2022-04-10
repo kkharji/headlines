@@ -7,7 +7,6 @@ mod components;
 mod fonts;
 mod macros;
 mod pages;
-mod route;
 mod state;
 
 fn main() {

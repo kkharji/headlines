@@ -1,2 +1,2 @@
-mod all_articles;
-pub use all_articles::all_article;
+mod headlines;
+pub use headlines::render as headlines;
