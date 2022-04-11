@@ -1,5 +1,6 @@
 use crate::pages::Page;
 use crate::state::Config;
+use crate::style::update_style;
 use eframe::egui::{CentralPanel, Context, Visuals};
 use eframe::epi::{self, Frame};
 use newsapp::{ArticleCollection, Result};
@@ -22,7 +23,8 @@ impl epi::App for App {
         self.render_theme(ctx);
         self.render_navbar(ctx, frame);
         CentralPanel::default().show(ctx, |ui| {
-            // header(ui, "Headlines");
+            update_style(ui);
+            self.render_header(ui, "Headlines");
             match self.page {
                 Page::Headlines => {
                     self.render_headlines_page(ui);

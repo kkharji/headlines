@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+use eframe::egui::Ui;
 use eframe::epaint::Color32;
 
 // COLORS
@@ -31,3 +32,12 @@ pub const GOLD: Color32 = Color32::from_rgb(255, 215, 0);
 
 // Styles
 pub const PADDING: f32 = 5.0;
+
+pub fn is_dark_mode(ui: &Ui) -> bool {
+    ui.style().visuals.dark_mode
+}
+
+pub fn update_style(ui: &mut Ui) {
+    let is_dark_mode = is_dark_mode(ui);
+    ui.style_mut().visuals.hyperlink_color = if is_dark_mode { CYAN } else { RED };
+}

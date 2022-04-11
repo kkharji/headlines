@@ -1,4 +1,5 @@
 use crate::app::App;
+use crate::fonts::inner_link;
 use crate::macros::*;
 use crate::pages::Page::{Headlines, Search};
 use eframe::egui::{menu, Context, Layout, RichText, TextStyle, TopBottomPanel, Ui};
@@ -10,12 +11,13 @@ impl App {
             Space!(ui);
             menu::bar(ui, |ui| {
                 Layout!(ui, left_to_right, |ui| {
-                    Label!(text: "📓", style: TextStyle::Name("NavPageLink".into()), ui)
+                    // Label!("📓", inner_link(), ui);
+                    ui.label(RichText::new("📓").text_style(inner_link()));
                 });
                 Layout!(ui, left_to_right, |ui| {
                     ui.add_space(5.);
-                    self.set_current_page_button(Headlines, ui);
-                    self.set_current_page_button(Search, ui);
+                    // self.set_current_page_button(Headlines, ui);
+                    // self.set_current_page_button(Search, ui);
                 });
                 Layout!(ui, right_to_left, |ui| {
                     self.close_button(ui, frame);

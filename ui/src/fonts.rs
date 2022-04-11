@@ -29,7 +29,8 @@ fn configure_text_styles(ctx: &Context) {
     let mut style = (*ctx.style()).clone();
     // Note: Set the size of different text styles.
     style.text_styles = [
-        (TextStyle::Name("NavPageLink".into()), {
+        // (title(), { FontId::new(32.0, FontFamily::Proportional) }),
+        (inner_link(), {
             FontId::new(25.0, FontFamily::Proportional)
         }),
         (TextStyle::Heading, {
@@ -50,4 +51,12 @@ fn configure_text_styles(ctx: &Context) {
     ]
     .into();
     ctx.set_style(style);
+}
+
+#[inline]
+pub fn inner_link() -> TextStyle {
+    TextStyle::Name("NavPageLink".into())
+}
+pub fn title() -> TextStyle {
+    TextStyle::Name("Title".into())
 }
