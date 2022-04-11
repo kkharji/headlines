@@ -1,5 +1,39 @@
 # Headlines
 
+## Lib
+
+### Usage Examples
+```rust 
+
+/*
+Find top 5 articles that
+    - contains "announce that"
+    - published in thehill and theverge
+*/
+request()
+    .headlines()
+    .limit(5)
+    .query(&["announce that"])
+    .run()
+    .unwrap()
+
+/*
+Find 10 articles that
+    - contains "Elon Musk" in content
+    - in english language
+    - published in bbc-news and engadget
+*/
+request()
+    .everything()
+    .limit(10)
+    .query(&["Elon Musk"])
+    .scope(&[scope::content()])
+    .language(lang::en())
+    .sources(&["bbc-news", "engadget"])
+    .run()
+    .unwrap()
+```
+
 ## CLI:
 
 ```
@@ -15,49 +49,16 @@ ARGS:
 
 OPTIONS:
     -c, --category <CATEGORY>
-            Article category
-
     -C, --country <COUNTRY>
-            Source country
-
     -d, --domains <DOMAINS>
-            Doamins to search in
-
     -e, --endpoint <ENDPOINT>
-            Type of query: everything, top-headings
-
-            [default: everything]
-
     -E, --exclude-domains <EXCLUDE_DOMAINS>
-            Doamins to exclude
-
     -f, --from <FROM>
-            Date range start
-
     -h, --help
-            Print help information
-
     -i, --in <SOURCES>
-            Source to search in. Max 20 sources
-
     -l, --limit <PAGE_SIZE>
-            Limit number of results to return
-
-            [default: 10]
-
     -L, --language <LANGUAGE>
-            Article language
-
-            [default: en]
-
     -P, --page <PAGE>
-            Page through results
-
-            [default: 1]
-
     -s, --scope <SEARCHIN>
-            Scope to match query in. Valid Options: title, description, content,
-
     -t, --to <TO>
-            Date range end
 ```
