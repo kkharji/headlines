@@ -24,7 +24,7 @@ macro_rules! Label {
 }
 
 macro_rules! Button {
-    (text: $text:expr, style: $style:ident, $ui:ident) => {
+    (text: $text:expr, style: $style:expr, $ui:ident) => {
         $ui.button(RichText::new($text).text_style($style))
     };
 }

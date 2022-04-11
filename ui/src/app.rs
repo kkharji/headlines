@@ -1,14 +1,15 @@
-use super::components::*;
-use super::state::State;
-use crate::pages;
-use crate::state::Page;
+use crate::pages::Page;
+use crate::state::Config;
 use eframe::egui::{CentralPanel, Context, Visuals};
-
 use eframe::epi::{self, Frame};
+use newsapp::{ArticleCollection, Result};
+use poll_promise::Promise;
 
 #[derive(Default)]
 pub struct App {
-    state: State,
+    pub page: Page,
+    pub config: Config,
+    pub articles: Option<Promise<Result<ArticleCollection>>>,
 }
 
 impl epi::App for App {
@@ -18,12 +19,14 @@ impl epi::App for App {
 
     // Lifecycle method. Called a LOT
     fn update(&mut self, ctx: &Context, frame: &Frame) {
-        self.update_theme(ctx);
-        navbar(ctx, frame, &mut self.state);
+        self.render_theme(ctx);
+        self.render_navbar(ctx, frame);
         CentralPanel::default().show(ctx, |ui| {
             // header(ui, "Headlines");
-            match self.state.current_page {
-                Page::Headlines => pages::headlines(ui, &mut self.state),
+            match self.page {
+                Page::Headlines => {
+                    self.render_headlines_page(ui);
+                }
                 Page::Search => {
                     ui.centered_and_justified(|ui| {
                         ui.heading("Someday");
@@ -31,7 +34,7 @@ impl epi::App for App {
                 }
                 Page::Home => {}
             }
-            footer(ctx);
+            self.render_footer(ctx);
         });
     }
 
@@ -39,13 +42,13 @@ impl epi::App for App {
     fn setup(&mut self, ctx: &Context, _frame: &Frame, _storage: Option<&dyn epi::Storage>) {
         crate::fonts::configure(ctx);
         // TODO: figure out a way to make real requests and make triggered by action.
-        let _ = self.state.articles(ctx);
+        let _ = self.articles_mut(ctx);
     }
 }
 
 impl App {
-    fn update_theme(&mut self, ctx: &Context) {
-        if self.state.config.dark_mode {
+    fn render_theme(&mut self, ctx: &Context) {
+        if self.config.dark_mode {
             ctx.set_visuals(Visuals::dark());
         } else {
             ctx.set_visuals(Visuals::light());

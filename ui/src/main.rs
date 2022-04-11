@@ -1,13 +1,13 @@
 use eframe::epaint::Vec2;
 use eframe::{run_native, NativeOptions};
 
-mod app;
-mod colors;
+pub mod app;
 mod components;
 mod fonts;
 mod macros;
 mod pages;
 mod state;
+mod style;
 
 fn main() {
     tracing_subscriber::fmt().init();
