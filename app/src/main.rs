@@ -7,7 +7,7 @@ use eframe::egui::{CentralPanel, Context, Ui};
 use eframe::epaint::Vec2;
 use eframe::epi::{self, Frame};
 use eframe::{run_native, NativeOptions};
-use newsapp::{ArticleCollection, Result};
+use headlines::{ArticleCollection, Result};
 use poll_promise::Promise;
 
 mod components;

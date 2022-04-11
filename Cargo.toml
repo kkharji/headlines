@@ -1,5 +1,5 @@
 [package]
-name = "newsapp"
+name = "headlines"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,12 +7,12 @@ edition = "2021"
 
 members = [
   "cli",
-  "ui"
+  "app"
 ]
 
 [lib]
-name = "newsapp"
-path = "lib/newsapp.rs"
+name = "headlines"
+path = "lib/export.rs"
 
 [dependencies]
 eyre = "0.6.8"

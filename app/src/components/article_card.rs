@@ -4,7 +4,7 @@ use crate::style::{is_dark_mode, BLACK, WHITE};
 use crate::App;
 use eframe::egui::{Layout, RichText, Separator, Ui};
 use eframe::epaint::Vec2;
-use newsapp::Article;
+use headlines::Article;
 
 impl App {
     pub fn render_article_card(&self, ui: &mut Ui, article: &Article) {

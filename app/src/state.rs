@@ -1,7 +1,7 @@
 use crate::mode::Mode;
 use crate::App;
 use eframe::egui::Context;
-use newsapp::{ArticleCollection, NewsApi, Result};
+use headlines::{ArticleCollection, NewsApi, Result};
 use poll_promise::Promise;
 
 #[derive(Default)]

@@ -1,6 +1,6 @@
 use clap::StructOpt;
 use colour as c;
-use newsapp::{ArticleCollection, NewsApi, Result};
+use headlines::{ArticleCollection, NewsApi, Result};
 
 fn render(articles: &ArticleCollection) {
     c::grey_ln!("---------------------------------------------------------------------");

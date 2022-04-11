@@ -1,10 +1,10 @@
-# NewsApi
+# Headlines
 
 ## CLI:
 
 ```
 USAGE:
-    newsapi_cli [OPTIONS] [QUERY]...
+    headlines_cli [OPTIONS] [QUERY]...
 
 ARGS:
     <QUERY>...
