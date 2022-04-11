@@ -1,19 +1,20 @@
 #![feature(derive_default_enum)]
 
+use crate::macros::*;
 use crate::pages::Page;
 use crate::state::Config;
-use crate::style::update_style;
-use eframe::egui::{CentralPanel, Context, Ui};
+use crate::style::{title_text, PADDING};
+use eframe::egui::{Context, Ui};
 use eframe::epaint::Vec2;
 use eframe::epi::{self, Frame};
 use eframe::{run_native, NativeOptions};
 use headlines::{Articles, Result};
 use poll_promise::Promise;
 
-mod components;
 mod fonts;
 mod macros;
 mod mode;
+mod navbar;
 mod pages;
 mod state;
 mod style;
@@ -26,49 +27,59 @@ pub struct App {
 }
 
 impl App {
+    pub fn render_header(&self, ui: &mut Ui, title: &str) {
+        VerticalCentered!(ui, |ui| ui.label(title_text(title)));
+        Space!(PADDING, ui);
+        Separator!(20., ui);
+    }
+
     /// Render main page
     pub fn render_page(&mut self, ui: &mut Ui) {
         match self.page {
-            Page::Headlines => {
-                self.render_headlines_page(ui);
-            }
+            Page::Headlines => self.render_headlines_page(ui),
             Page::Search => {
                 ui.centered_and_justified(|ui| {
                     ui.heading("Someday");
                 });
             }
-            Page::Settings => {}
-            Page::Favored => {}
-        }
-    }
-}
-
-impl epi::App for App {
-    fn name(&self) -> &str {
-        "Headlines"
+            Page::Settings | Page::Favored => {}
+        };
     }
 
-    // Lifecycle method. Called a LOT
-    fn update(&mut self, ctx: &Context, frame: &Frame) {
-        // self.render_theme(ctx);
-        self.render_navbar(ctx, frame);
-        CentralPanel::default().show(ctx, |ui| {
-            update_style(ui);
-            self.render_header(ui, "Headlines");
-            self.render_page(ui);
-            self.render_footer(ctx);
+    pub fn render_footer(&self, ctx: &Context) {
+        TopBottomPanel!(ctx, |ui| {
+            VerticalCentered!(ui, |ui| {
+                Space!(10.0, ui);
+                Label!("NewsApp®", Monospace, ui);
+                Hyperlink!("Powered by NewsApi", "https://newsapi.org", ui);
+                Hyperlink!("Made with egui", "https://github.com/emilk/egui", ui);
+                Space!(10.0, ui);
+            });
         });
-    }
-
-    // Lifecycle method. Called one time. best for preloading or configuration of the app.
-    fn setup(&mut self, ctx: &Context, _frame: &Frame, _storage: Option<&dyn epi::Storage>) {
-        crate::fonts::configure(ctx);
-        // TODO: figure out a way to make real requests and make triggered by action.
-        let _ = self.articles_mut(ctx);
     }
 }
 
 fn main() {
+    impl epi::App for App {
+        fn name(&self) -> &str {
+            "Headlines"
+        }
+
+        fn setup(&mut self, ctx: &Context, _frame: &Frame, _storage: Option<&dyn epi::Storage>) {
+            fonts::configure(ctx);
+            let _ = self.articles_mut(ctx);
+        }
+
+        fn update(&mut self, ctx: &Context, frame: &Frame) {
+            self.render_navbar(ctx, frame);
+            CentralPanel!(ctx, |ui| {
+                self.update_style(ui);
+                self.render_page(ui);
+                self.render_footer(ctx);
+            });
+        }
+    }
+
     tracing_subscriber::fmt().init();
     #[allow(unused_mut)]
     let mut options = NativeOptions::default();
@@ -76,4 +87,3 @@ fn main() {
 
     run_native(Box::new(App::default()), options);
 }
-

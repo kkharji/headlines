@@ -33,39 +33,53 @@ macro_rules! Separator {
         Separator!($ui, $size)
     };
 }
-//
+
 macro_rules! _Label {
-    (text: $text:expr, style: $style:ident, $ui:ident) => {
+    ($text:expr, $style:ident, $ui:ident) => {
         $ui.label(eframe::egui::RichText::new($text).text_style(eframe::egui::TextStyle::$style))
     };
-    (text: $text:expr, style: $style:expr, $ui:ident) => {
+
+    ($text:expr, $style:expr, $ui:ident) => {
         $ui.label(eframe::egui::RichText::new($text).text_style($style))
     };
 }
 
 macro_rules! Label {
     ($ui:ident, $text:expr, $style:ident) => {
-        _Label!(text: $text, style: $style, $ui)
+        _Label!($text, $style, $ui)
     };
 
     ($text:expr, $style:ident, $ui:ident) => {
-        _Label!(text: $text, style: $style, $ui)
+        _Label!($text, $style, $ui)
     };
 
     ($ui:ident, $text:expr) => {
-        _Label!(text: $text, style: Body, $ui)
+        _Label!($text, Body, $ui)
     };
 
     ($text:expr, $ui:ident) => {
-        _Label!(text: $text, style: Body, $ui)
+        _Label!($text, Body, $ui)
     };
 
     ($text:expr, $style:ident, $ui:expr) => {
-        _Label!(text: $text, style: $style, $ui)
+        _Label!($text, $style, $ui)
     };
 
     ($ui:ident, $text:expr, $style:expr) => {
-        _Label!(text: $text, style: $style, $ui)
+        _Label!($text, $style, $ui)
+    };
+
+    ($text:expr, $color:ident, $style:ident, $ui:ident) => {
+        $ui.colored_label($color, eframe::egui::RichText::new($text).$style())
+    };
+}
+macro_rules! UiWithLayout {
+    ($ui:ident, $dir:ident, $size:literal, $cb:expr) => {
+        $ui.allocate_ui_with_layout(
+            eframe::epaint::Vec2::new($ui.available_width(), $size),
+            eframe::egui::Layout::$dir(),
+            $cb,
+        )
     };
 }
 
@@ -83,6 +97,7 @@ macro_rules! VerticalCentered {
         VerticalCentered!($ui, $cb)
     };
 }
+
 macro_rules! TopBottomPanel {
     ($ctx:ident, $cb:expr) => {
         eframe::egui::TopBottomPanel::bottom("footer").show($ctx, $cb)
@@ -92,6 +107,13 @@ macro_rules! TopBottomPanel {
     };
 }
 
+macro_rules! CentralPanel {
+    ($ctx:ident, $cb:expr) => {
+        eframe::egui::CentralPanel::default().show($ctx, $cb)
+    };
+}
+
 pub(crate) use {
-    Button, Label, Layout, Separator, Space, TopBottomPanel, VerticalCentered, _Label,
+    Button, CentralPanel, Label, Layout, Separator, Space, TopBottomPanel, UiWithLayout,
+    VerticalCentered, _Label,
 };

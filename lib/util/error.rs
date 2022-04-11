@@ -10,7 +10,6 @@ pub enum HLError {
 
 #[derive(Serialize, Deserialize, Debug, derive_more::Display)]
 #[display(fmt = "{}", message)]
-#[cfg(any(feature = "net_block", feature = "net_async"))]
 pub struct RemoteError {
     status: String,
     code: String,

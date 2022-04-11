@@ -1,5 +1,6 @@
 #![allow(dead_code)]
-use eframe::egui::Ui;
+use crate::App;
+use eframe::egui::{RichText, Ui};
 use eframe::epaint::Color32;
 
 // COLORS
@@ -37,7 +38,12 @@ pub fn is_dark_mode(ui: &Ui) -> bool {
     ui.style().visuals.dark_mode
 }
 
-pub fn update_style(ui: &mut Ui) {
-    let is_dark_mode = is_dark_mode(ui);
-    ui.style_mut().visuals.hyperlink_color = if is_dark_mode { CYAN } else { RED };
+pub fn title_text(text: &str) -> RichText {
+    RichText::new(text).size(35.)
+}
+impl App {
+    pub fn update_style(&self, ui: &mut Ui) {
+        let is_dark_mode = is_dark_mode(ui);
+        ui.style_mut().visuals.hyperlink_color = if is_dark_mode { CYAN } else { RED };
+    }
 }

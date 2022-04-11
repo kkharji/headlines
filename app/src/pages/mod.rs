@@ -69,17 +69,17 @@ impl Page {
         }
     }
 
-    /// Return true if the page is [`Search`]
+    /// Return true if the page is Search
     pub fn is_search(&self) -> bool {
         matches!(self, Self::Search)
     }
 
-    /// Return true if the page is [`Headlines`]
+    /// Return true if the page is Headlines
     pub fn is_headlines(&self) -> bool {
         matches!(self, Self::Headlines)
     }
 
-    /// Return true if the page is [`Settings`]
+    /// Return true if the page is Settings
     pub fn is_settings(&self) -> bool {
         matches!(self, Self::Settings)
     }

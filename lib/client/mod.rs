@@ -17,7 +17,7 @@ pub struct Request {
     pub(super) scope: Vec<crate::article::scope::ArticleQueryScope>,
 
     /// Article language. Only valid for everything endpoint
-    #[cfg_attr(feature = "cli", clap(short = 'L', long, default_value_t = article::lang::en()))]
+    #[cfg_attr(feature = "cli", clap(short = 'L', long, default_value_t = crate::article::lang::en()))]
     pub(super) language: ArticleLanguage,
 
     /// Limit number of results to return
@@ -63,7 +63,6 @@ pub fn request() -> Request {
     Default::default()
 }
 
-use crate::article;
 use crate::article::category::ArticleCategory;
 use crate::article::ArticleLanguage;
 
