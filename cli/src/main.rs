@@ -10,20 +10,36 @@ mod tests {
     use headlines::article::{lang, scope};
 
     #[test]
-    fn case1() {
+    fn top_announcements() {
         /*
         Find top 5 articles that
-            - contains "announce that" in it's content/body
-            - written in english
-            - published in Hacker News
+            - contains "announce that"
+            - published in thehill and theverge
         */
         request()
             .headlines()
             .limit(5)
             .query(&["announce that"])
+            .run()
+            .unwrap()
+            .render();
+    }
+
+    #[test]
+    fn elon_musk() {
+        /*
+        Find 10 articles that
+            - contains "Elon Musk" in content
+            - in english language
+            - published in bbc-news and engadget
+        */
+        request()
+            .everything()
+            .limit(10)
+            .query(&["Elon Musk"])
             .scope(&[scope::content()])
             .language(lang::en())
-            // .sources(&["hacker-news"])
+            .sources(&["bbc-news", "engadget"])
             .run()
             .unwrap()
             .render();

@@ -16,7 +16,7 @@ pub struct Request {
     #[cfg_attr(feature = "cli", clap(short, long = "scope"))]
     pub(super) scope: Vec<crate::article::scope::ArticleQueryScope>,
 
-    /// Article language
+    /// Article language. Only valid for everything endpoint
     #[cfg_attr(feature = "cli", clap(short = 'L', long, default_value_t = article::lang::en()))]
     pub(super) language: ArticleLanguage,
 

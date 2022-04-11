@@ -7,7 +7,7 @@ static BASEURL: &str = "https://newsapi.org/v2";
 
 // TODO: create methods for last 24, last 3 days, last week
 // TODO: support setting country
-// TODO: support sort by
+// TODO: support sortBy only for everything
 
 /// Builder
 impl Request {
