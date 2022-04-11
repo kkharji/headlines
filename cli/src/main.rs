@@ -1,34 +1,31 @@
-use clap::StructOpt;
-use colour as c;
-use headlines::{ArticleCollection, NewsApi, Result};
+use headlines::client::request;
 
-fn render(articles: &ArticleCollection) {
-    c::grey_ln!("---------------------------------------------------------------------");
-    c::white_ln!("NewsApi Result:");
-    c::grey_ln!("---------------------------------------------------------------------");
-    for article in articles.iter() {
-        c::dark_green_ln!("> {}", article.title);
-        c::blue_ln!("  {}", article.url)
+fn main() {
+    request::from_cli_args().run().unwrap().render();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use headlines::article::{lang, scope};
+
+    #[test]
+    fn case1() {
+        /*
+        Find top 5 articles that
+            - contains "announce that" in it's content/body
+            - written in english
+            - published in Hacker News
+        */
+        request()
+            .headlines()
+            .limit(5)
+            .query(&["announce that"])
+            .scope(&[scope::content()])
+            .language(lang::en())
+            // .sources(&["hacker-news"])
+            .run()
+            .unwrap()
+            .render();
     }
 }
-
-fn main() -> Result<()> {
-    let api = NewsApi::parse();
-    let articles = api.request()?;
-    render(&articles);
-    Ok(())
-}
-
-// #[derive(clap::Parser)]
-// struct Args {
-//     #[clap(subcommand)]
-//     command: Commands,
-// }
-
-// #[derive(clap::Subcommand)]
-// enum Commands {
-//     /// Query NEWSAPI.
-//     Query(NewsApi),
-//     /// Get valid sources from NEWSAPI.
-//     Sources,
-// }

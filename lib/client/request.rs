@@ -1,15 +1,20 @@
-use super::error::NewsApiError;
-use super::{request, NewsApi};
-use crate::{ArticleCollection, Result};
+use super::{parser, Request};
+use crate::{Articles, HLError, Result};
 
 #[cfg(feature = "net_async")]
-use super::error::NewsApiErrorResponse;
+use crate::util::RemoteError;
 
-impl NewsApi {
+#[cfg(feature = "cli")]
+pub fn from_cli_args() -> Request {
+    use clap::StructOpt;
+    Request::parse()
+}
+
+impl Request {
     #[cfg(feature = "net_async")]
-    pub async fn request_async(self) -> Result<ArticleCollection> {
+    pub async fn run_async(self) -> Result<Articles> {
         let client = reqwest::Client::new();
-        let request = request::build(&self, client.get(self.url()))?.build()?;
+        let request = parser::parse(&self, client.get(self.url()))?.build()?;
 
         #[cfg(feature = "cache")]
         let (url, mut cache) = {
@@ -23,11 +28,11 @@ impl NewsApi {
         };
 
         let response = client.execute(request).await?;
-        let result: ArticleCollection = if response.status() != 200 {
+        let result: Articles = if response.status() != 200 {
             return response
-                .json::<NewsApiErrorResponse>()
+                .json::<RemoteError>()
                 .await
-                .map(|v| Err(NewsApiError::ResponseError(v).into()))?;
+                .map(|v| Err(HLError::Remote(v).into()))?;
         } else {
             response.json().await?
         };
@@ -39,8 +44,8 @@ impl NewsApi {
     }
 
     #[cfg(feature = "net_block")]
-    pub fn request(self) -> Result<ArticleCollection> {
-        let request = request::build(&self, ureq::get(&self.url()))?;
+    pub fn run(self) -> Result<Articles> {
+        let request = parser::parse(&self, ureq::get(&self.url()))?;
 
         #[cfg(feature = "cache")]
         let (url, mut cache) = {
@@ -53,9 +58,9 @@ impl NewsApi {
             }
         };
 
-        let response = request.call().map_err(NewsApiError::from)?;
+        let response = request.call().map_err(HLError::from)?;
         let string = response.into_string()?;
-        let result: ArticleCollection = eyre::Context::context(
+        let result: Articles = eyre::Context::context(
             serde_json::from_str(&string),
             format!("NewsApi Response Serialization: {}", string),
         )?;
@@ -67,13 +72,13 @@ impl NewsApi {
     }
 
     #[cfg(feature = "egui")]
-    pub fn request_promise(
+    pub fn run_promise(
         self,
         ctx: &eframe::egui::Context,
-    ) -> poll_promise::Promise<Result<ArticleCollection>> {
+    ) -> poll_promise::Promise<Result<Articles>> {
         let ctx = ctx.clone();
         poll_promise::Promise::spawn_thread("newsapi", move || {
-            let articles = self.request()?;
+            let articles = self.run()?;
             ctx.request_repaint();
             Ok(articles)
         })

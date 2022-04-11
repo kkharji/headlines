@@ -1,17 +1,11 @@
-mod category;
-mod collection;
-mod language;
-mod scope;
-mod source;
-
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Deserializer, Serialize};
 
-pub use category::*;
-pub use collection::*;
-pub use language::*;
-pub use scope::*;
-pub use source::*;
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ArticleSource {
+    pub id: Option<String>,
+    pub name: String,
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -38,4 +32,32 @@ where
         Ok(str) => str,
         Err(_) => "".into(),
     })
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct Articles {
+    pub articles: Vec<Article>,
+}
+
+impl std::ops::Deref for Articles {
+    type Target = Vec<Article>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.articles
+    }
+}
+
+impl Articles {
+    #[cfg(feature = "colour")]
+    pub fn render(&self) {
+        let sep = "---------------------------------------------------------------------";
+        use colour::*;
+        grey_ln!(sep);
+        white_ln!("NewsApi Result:");
+        grey_ln!(sep);
+        self.iter().for_each(|a| {
+            dark_green_ln!("> {}", a.title);
+            blue_ln!("  {}", a.url)
+        })
+    }
 }

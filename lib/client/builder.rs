@@ -1,24 +1,28 @@
-use super::endpoint::NewsApiEndpoint;
-use super::NewsApi;
-use crate::article::{ArticleLanguage, ArticleSearchScope};
+use super::endpoint::{self, EndPoint};
+use super::Request;
+use crate::article::{ArticleLanguage, ArticleQueryScope};
 use chrono::NaiveDate;
 
 static BASEURL: &str = "https://newsapi.org/v2";
 
+// TODO: create methods for last 24, last 3 days, last week
+// TODO: support setting country
+// TODO: support sort by
+
 /// Builder
-impl NewsApi {
+impl Request {
     /// Get Request url
     pub(super) fn url(&self) -> String {
         self.endpoint.inject_url(BASEURL)
     }
 
-    /// Set the NewsApi builder's searchin.
-    pub fn searchin(mut self, searchin: &[ArticleSearchScope]) -> Self {
-        self.searchin = searchin.to_vec();
+    /// Set the scope in which to search for with [`Request.query`]
+    pub fn scope(mut self, searchin: &[ArticleQueryScope]) -> Self {
+        self.scope = searchin.to_vec();
         self
     }
 
-    /// Set the NewsApi builder's sources.
+    /// Set request's sources.
     pub fn sources(mut self, sources: &[&str]) -> Self {
         self.sources = Some(
             sources
@@ -29,7 +33,7 @@ impl NewsApi {
         self
     }
 
-    /// Set the NewsApi builder's domains.
+    /// Set request's domains.
     pub fn domains(mut self, domains: &[&str]) -> Self {
         self.domains = Some(
             domains
@@ -40,7 +44,7 @@ impl NewsApi {
         self
     }
 
-    /// Set the NewsApi builder's exclude domains.
+    /// Set request's domains to exclude.
     pub fn exclude_domains(mut self, exclude_domains: &[&str]) -> Self {
         let value = exclude_domains
             .into_iter()
@@ -50,37 +54,37 @@ impl NewsApi {
         self
     }
 
-    /// Set the NewsApi builder's from.
+    /// Set min date to return articles.
     pub fn from(mut self, from: NaiveDate) -> Self {
         self.from = Some(from);
         self
     }
 
-    /// Set the NewsApi builder's to.
+    /// Set max date to return articles.
     pub fn upto(mut self, to: NaiveDate) -> Self {
         self.to = Some(to);
         self
     }
 
-    /// Set the NewsApi builder's language.
+    /// Set articles language.
     pub fn language(mut self, language: ArticleLanguage) -> Self {
         self.language = language.into();
         self
     }
 
-    /// Set the news api builder's page.
+    /// Set the request's page.
     pub fn page(mut self, page: u32) -> Self {
-        self.page = page;
+        self.page = Some(page);
         self
     }
 
-    /// Set the news api builder's page size.
-    pub fn page_size(mut self, page_size: u32) -> Self {
-        self.page_size = page_size;
+    /// Set a limit to the number of results returned.
+    pub fn limit(mut self, page_size: u32) -> Self {
+        self.page_size = Some(page_size);
         self
     }
 
-    /// Set the news api builder's query.
+    /// Set the request's query.
     pub fn query(mut self, query: &[&str]) -> Self {
         let value = query
             .into_iter()
@@ -94,9 +98,21 @@ impl NewsApi {
         self.from(from).upto(to)
     }
 
-    /// Set the news api builder's endpoint.
-    pub fn endpoint(mut self, endpoint: NewsApiEndpoint) -> Self {
+    /// Set the request's endpoint.
+    pub fn endpoint(mut self, endpoint: EndPoint) -> Self {
         self.endpoint = endpoint;
+        self
+    }
+
+    /// Set the request's endpoint to top-headlines
+    pub fn headlines(mut self) -> Self {
+        self.endpoint = endpoint::top_headlines();
+        self
+    }
+
+    /// Set the request's endpoint to everything
+    pub fn everything(mut self) -> Self {
+        self.endpoint = endpoint::everything();
         self
     }
 }

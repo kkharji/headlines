@@ -4,7 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-chrono = "0.4.19"
-clap = { version = "3.1.8", features = ["derive"] }
-colour = "0.6.0"
-headlines = { path = "../", features = ["derive_clap", "cache", "net_block"] }
+headlines = { path = "../", features = ["cli", "cache", "net_block"] }

@@ -7,7 +7,7 @@ use eframe::egui::{CentralPanel, Context, Ui};
 use eframe::epaint::Vec2;
 use eframe::epi::{self, Frame};
 use eframe::{run_native, NativeOptions};
-use headlines::{ArticleCollection, Result};
+use headlines::{Articles, Result};
 use poll_promise::Promise;
 
 mod components;
@@ -22,12 +22,30 @@ mod style;
 pub struct App {
     pub page: Page,
     pub config: Config,
-    pub articles: Option<Promise<Result<ArticleCollection>>>,
+    pub articles: Option<Promise<Result<Articles>>>,
+}
+
+impl App {
+    /// Render main page
+    pub fn render_page(&mut self, ui: &mut Ui) {
+        match self.page {
+            Page::Headlines => {
+                self.render_headlines_page(ui);
+            }
+            Page::Search => {
+                ui.centered_and_justified(|ui| {
+                    ui.heading("Someday");
+                });
+            }
+            Page::Settings => {}
+            Page::Favored => {}
+        }
+    }
 }
 
 impl epi::App for App {
     fn name(&self) -> &str {
-        "NewsApp"
+        "Headlines"
     }
 
     // Lifecycle method. Called a LOT
@@ -50,24 +68,6 @@ impl epi::App for App {
     }
 }
 
-impl App {
-    /// Render main page
-    pub fn render_page(&mut self, ui: &mut Ui) {
-        match self.page {
-            Page::Headlines => {
-                self.render_headlines_page(ui);
-            }
-            Page::Search => {
-                ui.centered_and_justified(|ui| {
-                    ui.heading("Someday");
-                });
-            }
-            Page::Settings => {}
-            Page::Favored => {}
-        }
-    }
-}
-
 fn main() {
     tracing_subscriber::fmt().init();
     #[allow(unused_mut)]
@@ -76,3 +76,4 @@ fn main() {
 
     run_native(Box::new(App::default()), options);
 }
+

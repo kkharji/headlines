@@ -1,23 +1,24 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, thiserror::Error)]
-pub enum NewsApiError {
+pub enum HLError {
     #[error("NewsApi: {0}")]
-    ResponseError(NewsApiErrorResponse),
+    Remote(RemoteError),
     #[error("Unexpected Error")]
     EyreError(#[from] eyre::Error),
 }
 
 #[derive(Serialize, Deserialize, Debug, derive_more::Display)]
 #[display(fmt = "{}", message)]
-pub struct NewsApiErrorResponse {
+#[cfg(any(feature = "net_block", feature = "net_async"))]
+pub struct RemoteError {
     status: String,
     code: String,
     message: String,
 }
 
 #[cfg(feature = "net_block")]
-impl From<ureq::Error> for NewsApiError {
+impl From<ureq::Error> for HLError {
     fn from(error: ureq::Error) -> Self {
         use eyre::eyre;
         let response = match error.into_response() {
@@ -32,10 +33,10 @@ impl From<ureq::Error> for NewsApiError {
             Err(e) => return Self::EyreError(eyre!("NewsApi {message}: ParseError {e}")),
         };
 
-        match serde_json::from_str::<NewsApiErrorResponse>(&resposne_string) {
+        match serde_json::from_str::<RemoteError>(&resposne_string) {
             Ok(mut re) => {
                 re.message = format!("{message}: {}", re.message);
-                Self::ResponseError(re)
+                Self::Remote(re)
             }
             Err(e) => Self::EyreError(eyre!("NewsApi {message}: ParseError {e}")),
         }
@@ -43,7 +44,7 @@ impl From<ureq::Error> for NewsApiError {
 }
 
 #[cfg(feature = "net_async")]
-impl From<(String, reqwest::Response)> for NewsApiError {
+impl From<(String, reqwest::Response)> for HLError {
     fn from(response: (String, reqwest::Response)) -> Self {
         use eyre::eyre;
 
@@ -51,10 +52,10 @@ impl From<(String, reqwest::Response)> for NewsApiError {
 
         let resposne_string = response.0;
 
-        match serde_json::from_str::<NewsApiErrorResponse>(&resposne_string) {
+        match serde_json::from_str::<RemoteError>(&resposne_string) {
             Ok(mut re) => {
                 re.message = format!("{message}: {}", re.message);
-                Self::ResponseError(re)
+                Self::Remote(re)
             }
             Err(e) => Self::EyreError(eyre!("NewsApi {message}: ParseError {e}")),
         }

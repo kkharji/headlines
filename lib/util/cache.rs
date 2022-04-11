@@ -1,16 +1,18 @@
 //! Simple cache so we don't consume all the request allowed for free accounts.
 //! Requires `cache` feature
-use crate::{ArticleCollection, NewsApi};
+
+use crate::client::Request;
+use crate::Articles;
 use eyre::{bail, Result};
 use redis::Commands;
 use std::collections::HashMap;
 
-pub struct NewsApiCache {
-    cache: HashMap<String, ArticleCollection>,
+pub struct Cache {
+    cache: HashMap<String, Articles>,
     client: redis::Client,
 }
 
-impl Default for NewsApiCache {
+impl Default for Cache {
     fn default() -> Self {
         // WARN: force unwrap
         let mut cache = Self {
@@ -22,39 +24,36 @@ impl Default for NewsApiCache {
     }
 }
 
-impl NewsApiCache {
+impl Cache {
     const KEY: &'static str = "newsapi_cache";
     pub fn load(&mut self) -> Result<()> {
         let mut conn = self.client.get_connection()?;
         let result: String = match conn.get(Self::KEY) {
             Ok(r) => r,
-            Err(e) => {
-                eprintln!("{e}");
-                return Ok(());
-            }
+            Err(_) => return Ok(()),
         };
 
         self.cache = serde_json::from_str(&result)?;
 
         Ok(())
     }
-    pub fn get(&self, url: &str) -> Result<ArticleCollection> {
+    pub fn get(&self, url: &str) -> Result<Articles> {
         if let Some(result) = self.cache.get(url) {
-            println!("From CACHE ....");
+            print!("C");
             return Ok(result.clone());
         }
         bail!("No cache for {url}")
     }
 
-    pub fn all(&self) -> ArticleCollection {
+    pub fn all(&self) -> Articles {
         let mut articles = vec![];
         for a in self.cache.values() {
             articles.append(&mut a.articles.clone())
         }
-        ArticleCollection { articles }
+        Articles { articles }
     }
 
-    pub fn update(&mut self, url: String, data: ArticleCollection) -> Result<()> {
+    pub fn update(&mut self, url: String, data: Articles) -> Result<()> {
         self.cache.insert(url, data);
         self.persist()?;
         Ok(())
@@ -67,14 +66,14 @@ impl NewsApiCache {
     }
 }
 
-impl NewsApi {
+impl Request {
     #[cfg(feature = "net_async")]
-    pub async fn request_from_cache_async(&self) -> Result<ArticleCollection> {
-        Ok(NewsApiCache::default().all())
+    pub async fn from_cache_async(&self) -> Result<Articles> {
+        Ok(Cache::default().all())
     }
 
-    pub(crate) fn try_from_cache(&self, url: &str) -> (NewsApiCache, Result<ArticleCollection>) {
-        let cache = NewsApiCache::default();
+    pub(crate) fn try_from_cache(&self, url: &str) -> (Cache, Result<Articles>) {
+        let cache = Cache::default();
         if let Ok(value) = cache.get(&url) {
             return (cache, Ok(value));
         }
@@ -82,19 +81,19 @@ impl NewsApi {
     }
 
     #[cfg(feature = "net_block")]
-    pub fn request_from_cache(self) -> Result<ArticleCollection> {
-        Ok(NewsApiCache::default().all())
+    pub fn from_cache(self) -> Result<Articles> {
+        Ok(Cache::default().all())
     }
 
     #[cfg(feature = "egui")]
-    pub fn request_from_cache_promise(
+    pub fn from_cache_promise(
         self,
         ctx: &eframe::egui::Context,
-    ) -> poll_promise::Promise<Result<ArticleCollection>> {
+    ) -> poll_promise::Promise<Result<Articles>> {
         let ctx = ctx.clone();
 
         poll_promise::Promise::spawn_thread("newsapi", move || {
-            let articles = self.request_from_cache()?;
+            let articles = self.from_cache()?;
             ctx.request_repaint();
             Ok(articles)
         })
