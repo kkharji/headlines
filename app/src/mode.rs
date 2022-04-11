@@ -1,20 +1,19 @@
 use crate::macros::Button;
 use eframe::egui::TextStyle::Body;
 use eframe::egui::{Ui, Visuals};
-use strum::AsRefStr;
 
-#[derive(AsRefStr, Default, Clone)]
+#[derive(Default)]
 pub enum Mode {
     #[default]
     Dark,
     Light,
 }
 
-impl Into<Visuals> for Mode {
-    fn into(self) -> Visuals {
-        match self {
-            Self::Dark => Visuals::dark(),
-            Self::Light => Visuals::light(),
+impl From<&mut Mode> for Visuals {
+    fn from(mode: &mut Mode) -> Self {
+        match mode {
+            Mode::Dark => Self::dark(),
+            Mode::Light => Self::light(),
         }
     }
 }
@@ -23,28 +22,24 @@ impl Mode {
     /// Update Mode to alternative mode
     pub fn update(&mut self, ui: &Ui) {
         *self = self.alter();
-        ui.ctx().set_visuals(self.clone().into());
+        ui.ctx().set_visuals(self.into());
     }
 
     /// Get UI button
     pub fn render_button(&mut self, ui: &mut Ui) {
         let alter = self.alter();
-        let (icon, hover) = (alter.icon(), alter.hover_text());
+        let (icon, hover) = alter.assets();
         if Button!(icon, Body, ui).on_hover_text(hover).clicked() {
             self.update(ui);
         }
     }
 
     /// Get mode hover text.
-    pub fn hover_text(&self) -> String {
-        format!("Toggle {} mode", self.as_ref())
-    }
-
-    /// Get Alternative ModeIcon.
-    pub fn icon(&self) -> &str {
+    #[inline]
+    pub fn assets(&self) -> (&'static str, &'static str) {
         match self {
-            Self::Light => "🌞",
-            Self::Dark => "🌙",
+            Self::Dark => ("🌙", "Toggle Dark mode"),
+            Self::Light => ("🌞", "Toggle Light Mode"),
         }
     }
 
