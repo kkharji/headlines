@@ -1,16 +1,12 @@
-use crate::app::App;
+use crate::mode::Mode;
+use crate::App;
 use eframe::egui::Context;
 use newsapp::{ArticleCollection, NewsApi, Result};
 use poll_promise::Promise;
 
+#[derive(Default)]
 pub struct Config {
-    pub dark_mode: bool,
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self { dark_mode: true }
-    }
+    pub mode: Mode,
 }
 
 impl App {

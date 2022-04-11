@@ -1,7 +1,7 @@
 //! Main Headline page
 
-use crate::app::App;
 use crate::style::RED;
+use crate::App;
 use eframe::egui::{ScrollArea, Spinner, Ui};
 
 impl App {

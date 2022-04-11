@@ -1,5 +1,5 @@
-use crate::app::App;
 use crate::macros::*;
+use crate::App;
 use eframe::egui::Context;
 
 impl App {

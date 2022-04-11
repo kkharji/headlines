@@ -1,6 +1,9 @@
 mod hyperlink;
 pub(crate) use hyperlink::*;
 
+// mod text;
+// pub(crate) use text::*;
+
 macro_rules! Layout {
     ($ui:ident, $dir:ident, $closure:expr) => {
         $ui.with_layout(Layout::$dir(), $closure);
@@ -9,18 +12,28 @@ macro_rules! Layout {
 
 macro_rules! Space {
     ($ui:ident) => {
-        Space!($ui, 10.)
-    };
-
-    ($ui:ident, $size:expr) => {
-        $ui.add_space($size)
+        Space!(10., $ui)
     };
 
     ($size:expr, $ui:ident) => {
-        Space!($ui, $size)
+        $ui.add_space($size)
     };
 }
 
+macro_rules! Separator {
+    ($ui:ident) => {
+        $ui.add(eframe::egui::Separator::default())
+    };
+
+    ($ui:ident, $size:expr) => {
+        $ui.add(eframe::egui::Separator::default().spacing($size))
+    };
+
+    ($size:expr, $ui:ident) => {
+        Separator!($ui, $size)
+    };
+}
+//
 macro_rules! _Label {
     (text: $text:expr, style: $style:ident, $ui:ident) => {
         $ui.label(eframe::egui::RichText::new($text).text_style(eframe::egui::TextStyle::$style))
@@ -57,8 +70,8 @@ macro_rules! Label {
 }
 
 macro_rules! Button {
-    (text: $text:expr, style: $style:expr, $ui:ident) => {
-        $ui.button(RichText::new($text).text_style($style))
+    ($text:expr, $style:expr, $ui:ident) => {
+        $ui.button(eframe::egui::RichText::new($text).text_style($style))
     };
 }
 
@@ -79,4 +92,6 @@ macro_rules! TopBottomPanel {
     };
 }
 
-pub(crate) use {Button, Label, Layout, Space, TopBottomPanel, VerticalCentered, _Label};
+pub(crate) use {
+    Button, Label, Layout, Separator, Space, TopBottomPanel, VerticalCentered, _Label,
+};

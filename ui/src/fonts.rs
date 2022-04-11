@@ -57,6 +57,8 @@ fn configure_text_styles(ctx: &Context) {
 pub fn inner_link() -> TextStyle {
     TextStyle::Name("NavPageLink".into())
 }
+
+#[allow(dead_code)]
 pub fn title() -> TextStyle {
     TextStyle::Name("Title".into())
 }

@@ -1,54 +1,47 @@
-use crate::app::App;
 use crate::fonts::inner_link;
 use crate::macros::*;
-use crate::pages::Page::{Headlines, Search};
-use eframe::egui::{menu, Context, Layout, RichText, TextStyle, TopBottomPanel, Ui};
+use crate::pages::Page;
+use crate::App;
+use eframe::egui::TextStyle::Body;
+use eframe::egui::{menu, Context, Layout, RichText, TopBottomPanel, Ui};
 use eframe::epi::Frame;
 
+/// FIX: use svg icons. text sizes differs
 impl App {
-    pub fn render_navbar(&mut self, ctx: &Context, frame: &Frame) {
+    pub fn render_navbar(&mut self, ctx: &Context, _frame: &Frame) {
         TopBottomPanel::top("top_panel").show(ctx, |ui| {
-            Space!(ui);
+            Space!(5., ui);
             menu::bar(ui, |ui| {
                 Layout!(ui, left_to_right, |ui| {
-                    // Label!("📓", inner_link(), ui);
                     ui.label(RichText::new("📓").text_style(inner_link()));
                 });
-                Layout!(ui, left_to_right, |ui| {
-                    ui.add_space(5.);
-                    // self.set_current_page_button(Headlines, ui);
-                    // self.set_current_page_button(Search, ui);
-                });
+
                 Layout!(ui, right_to_left, |ui| {
-                    self.close_button(ui, frame);
-                    self.refresh_button(ui);
-                    self.toggle_theme_button(ui);
+                    Space!(5., ui);
+                    // self.close_app(ui, frame);
+                    self.toggle_settings_window(ui);
+                    self.refresh_articles(ui);
+                    self.config.mode.render_button(ui);
+                    self.page.render_button(ui, true);
                 });
             });
-            Space!(ui);
+            Space!(5., ui);
         });
     }
 
-    /// toggle between dark and light theme
-    pub fn toggle_theme_button(&mut self, ui: &mut Ui) {
-        let isdark = self.config.dark_mode;
-        let text = if isdark { "🌞" } else { "🌙" };
-        if Button!(text: text, style: TextStyle::Body, ui).clicked() {
-            self.config.dark_mode = !self.config.dark_mode;
-        };
+    /// Refresh current page data.
+    pub fn refresh_articles(&mut self, ui: &mut Ui) {
+        if Button!("🔄", Body, ui)
+            .on_hover_text("Refresh data")
+            .clicked()
+        {};
     }
 
-    /// refresh current page data.
-    pub fn refresh_button(&mut self, ui: &mut Ui) {
-        if Button!(text: "🔄", style: TextStyle::Body, ui).clicked() {};
-    }
-
-    /// Close application
-    pub fn close_button(&mut self, ui: &mut Ui, frame: &Frame) {
-        if Button!(text: "❌", style: TextStyle::Body, ui).clicked() {
-            if !cfg!(target_arch = "wasm32") {
-                frame.quit();
-            }
+    /// Toggle settings window
+    pub fn toggle_settings_window(&mut self, ui: &mut Ui) {
+        let mut settings = Page::Settings;
+        if settings.render_button(ui, false).clicked() {
+            self.page = settings;
         }
     }
 }

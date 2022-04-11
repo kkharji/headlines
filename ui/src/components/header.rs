@@ -1,11 +1,12 @@
 use super::PADDING;
-use crate::app::App;
-use eframe::egui::{RichText, Separator, Ui};
+use crate::macros::{Separator, Space, VerticalCentered};
+use crate::App;
+use eframe::egui::{RichText, Ui};
 
 impl App {
     pub fn render_header(&self, ui: &mut Ui, title: &str) {
-        ui.vertical_centered(|ui| ui.label(RichText::new(title).size(33.)));
-        ui.add_space(PADDING);
-        ui.add(Separator::default().spacing(20.));
+        VerticalCentered!(ui, |ui| { ui.label(RichText::new(title).size(33.)) });
+        Space!(PADDING, ui);
+        Separator!(20., ui);
     }
 }
