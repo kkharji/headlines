@@ -1,8 +1,9 @@
 use crate::macros::Button;
 use eframe::egui::TextStyle::Body;
-use eframe::egui::{Ui, Visuals};
+use eframe::egui::{Context, Response, Ui, Visuals};
+use serde::{Deserialize, Serialize};
 
-#[derive(Default)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub enum Mode {
     #[default]
     Dark,
@@ -18,6 +19,15 @@ impl From<&mut Mode> for Visuals {
     }
 }
 
+impl From<&Mode> for Visuals {
+    fn from(mode: &Mode) -> Self {
+        match mode {
+            Mode::Dark => Self::dark(),
+            Mode::Light => Self::light(),
+        }
+    }
+}
+
 impl Mode {
     /// Update Mode to alternative mode
     pub fn update(&mut self, ui: &Ui) {
@@ -26,12 +36,10 @@ impl Mode {
     }
 
     /// Get UI button
-    pub fn render_button(&mut self, ui: &mut Ui) {
+    pub fn render_button(&mut self, ui: &mut Ui) -> Response {
         let alter = self.alter();
         let (icon, hover) = alter.assets();
-        if Button!(icon, Body, ui).on_hover_text(hover).clicked() {
-            self.update(ui);
-        }
+        Button!(icon, Body, ui).on_hover_text(hover)
     }
 
     /// Get mode hover text.

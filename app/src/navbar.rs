@@ -21,7 +21,10 @@ impl App {
                     // self.close_app(ui, frame);
                     self.toggle_settings_window(ui);
                     self.refresh_articles(ui);
-                    self.config.mode.render_button(ui);
+                    if self.config.mode.render_button(ui).clicked() {
+                        self.config.mode.update(ui);
+                        self.config.store();
+                    };
                     self.page.render_button(ui, true);
                 });
             });

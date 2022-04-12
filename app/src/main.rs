@@ -1,8 +1,8 @@
-#![feature(derive_default_enum)]
+#![feature(derive_default_enum, default_free_fn)]
 
+use crate::config::Config;
 use crate::macros::*;
 use crate::pages::Page;
-use crate::state::Config;
 use crate::style::{title_text, PADDING};
 use eframe::egui::{Context, Ui};
 use eframe::epaint::Vec2;
@@ -10,7 +10,9 @@ use eframe::epi::{self, Frame};
 use eframe::{run_native, NativeOptions};
 use headlines::{Articles, Result};
 use poll_promise::Promise;
+use std::default::default;
 
+mod config;
 mod fonts;
 mod macros;
 mod mode;
@@ -59,31 +61,36 @@ impl App {
     }
 }
 
-fn main() {
-    impl epi::App for App {
-        fn name(&self) -> &str {
-            "Headlines"
-        }
-
-        fn setup(&mut self, ctx: &Context, _frame: &Frame, _storage: Option<&dyn epi::Storage>) {
-            fonts::configure(ctx);
-            let _ = self.articles_mut(ctx);
-        }
-
-        fn update(&mut self, ctx: &Context, frame: &Frame) {
-            self.render_navbar(ctx, frame);
-            CentralPanel!(ctx, |ui| {
-                self.update_style(ui);
-                self.render_page(ui);
-                self.render_footer(ctx);
-            });
-        }
+impl epi::App for App {
+    fn name(&self) -> &str {
+        "Headlines"
     }
 
+    fn setup(&mut self, ctx: &Context, _frame: &Frame, _storage: Option<&dyn epi::Storage>) {
+        fonts::configure(ctx);
+        let _ = self.articles_mut(ctx);
+
+        self.config.load();
+        self.config.ensure(ctx);
+    }
+
+    fn update(&mut self, ctx: &Context, frame: &Frame) {
+        self.render_navbar(ctx, frame);
+        CentralPanel!(ctx, |ui| {
+            self.update_style(ui);
+            self.render_page(ui);
+            self.render_footer(ctx);
+        });
+    }
+}
+
+fn main() {
     tracing_subscriber::fmt().init();
     #[allow(unused_mut)]
     let mut options = NativeOptions::default();
     options.initial_window_size = Some(Vec2::new(740., 960.));
 
-    run_native(Box::new(App::default()), options);
+    let app: Box<App> = default();
+
+    run_native(app, options);
 }
