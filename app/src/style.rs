@@ -38,7 +38,7 @@ impl App {
         let dark_mode = self.config.mode.is_dark();
         style.visuals = Visuals {
             dark_mode,
-            hyperlink_color: self.red(),
+            hyperlink_color: self.blue(),
             widgets: Widgets {
                 noninteractive: WidgetVisuals {
                     // Window Background,

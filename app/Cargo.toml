@@ -2,6 +2,7 @@
 name = "headlines_app"
 version = "0.1.0"
 edition = "2021"
+description = "Experimental NewsApi UI client with egui"
 
 
 [dependencies]
@@ -16,3 +17,8 @@ tracing = "0.1.32"
 tracing-subscriber = "0.3.10"
 rgba_simple = "0.6.0"
 paste = "1.0.7"
+
+[package.metadata.bundle]
+name = "Headlines"
+identifier = "io.github.tami5"
+resources = ["MesloLGL_NF_Bold.ttf", "MesloLGL_NF_Regular.ttf"]
