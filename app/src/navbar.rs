@@ -1,6 +1,7 @@
 use crate::fonts::inner_link;
 use crate::macros::*;
 use crate::pages::Page;
+use crate::style::text;
 use crate::App;
 use eframe::egui::TextStyle::Body;
 use eframe::egui::{menu, Context, Layout, RichText, TopBottomPanel, Ui};
@@ -22,14 +23,20 @@ impl App {
                     self.toggle_settings_window(ui);
                     self.refresh_articles(ui);
                     if self.config.mode.render_button(ui).clicked() {
-                        self.config.mode.update(ui);
-                        self.config.store();
+                        self.configure_styles(ui.ctx(), true);
                     };
                     self.page.render_button(ui, true);
                 });
             });
             Space!(5., ui);
         });
+    }
+
+    pub fn render_header(&self, ui: &mut Ui, title: &str) {
+        VerticalCentered!(ui, |ui| ui
+            .label(text(title).size(35.).color(self.yellow())));
+        Space!(crate::style::padding(), ui);
+        Separator!(20., ui);
     }
 
     /// Refresh current page data.

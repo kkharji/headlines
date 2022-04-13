@@ -1156,7 +1156,9 @@ dependencies = [
  "confy",
  "eframe",
  "headlines",
+ "paste",
  "poll-promise",
+ "rgba_simple",
  "serde",
  "strum",
  "tracing",
@@ -1883,6 +1885,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "paste"
+version = "1.0.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0c520e05135d6e763148b6426a837e239041653ba7becd2e538c076c738025fc"
+
+[[package]]
 name = "percent-encoding"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2129,6 +2137,15 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "winreg 0.10.1",
+]
+
+[[package]]
+name = "rgba_simple"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "93f6e5bd1653168fcfc1e7280a9d4a01145971e132adcda3e69bbaa9b6974d1a"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

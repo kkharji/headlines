@@ -1,6 +1,6 @@
 use crate::macros::Button;
 use eframe::egui::TextStyle::Body;
-use eframe::egui::{Context, Response, Ui, Visuals};
+use eframe::egui::{Response, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Deserialize, Serialize)]
@@ -10,29 +10,11 @@ pub enum Mode {
     Light,
 }
 
-impl From<&mut Mode> for Visuals {
-    fn from(mode: &mut Mode) -> Self {
-        match mode {
-            Mode::Dark => Self::dark(),
-            Mode::Light => Self::light(),
-        }
-    }
-}
-
-impl From<&Mode> for Visuals {
-    fn from(mode: &Mode) -> Self {
-        match mode {
-            Mode::Dark => Self::dark(),
-            Mode::Light => Self::light(),
-        }
-    }
-}
-
 impl Mode {
     /// Update Mode to alternative mode
-    pub fn update(&mut self, ui: &Ui) {
+    pub fn toggle(&mut self) {
         *self = self.alter();
-        ui.ctx().set_visuals(self.into());
+        tracing::trace!("Mode changed");
     }
 
     /// Get UI button

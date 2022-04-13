@@ -1,4 +1,5 @@
 mod headlines;
+mod settings;
 use eframe::egui::TextStyle::Body;
 use eframe::egui::{Response, RichText, Ui};
 use strum::{AsRefStr, EnumString};

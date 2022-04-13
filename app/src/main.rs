@@ -1,12 +1,11 @@
-#![feature(derive_default_enum, default_free_fn)]
+#![feature(derive_default_enum, default_free_fn, concat_idents)]
 
 use crate::config::Config;
 use crate::macros::*;
-use crate::pages::Page;
-use crate::style::{title_text, PADDING};
-use eframe::egui::{Context, Ui};
+use crate::pages::Page::{self, *};
+use eframe::egui::Context;
 use eframe::epaint::Vec2;
-use eframe::epi::{self, Frame};
+use eframe::epi::{App as EpiApp, Frame as EpiFrame, Storage as EpiStorage};
 use eframe::{run_native, NativeOptions};
 use headlines::{Articles, Result};
 use poll_promise::Promise;
@@ -28,27 +27,30 @@ pub struct App {
     pub articles: Option<Promise<Result<Articles>>>,
 }
 
-impl App {
-    pub fn render_header(&self, ui: &mut Ui, title: &str) {
-        VerticalCentered!(ui, |ui| ui.label(title_text(title)));
-        Space!(PADDING, ui);
-        Separator!(20., ui);
+impl EpiApp for App {
+    fn name(&self) -> &str {
+        "Headlines"
     }
 
-    /// Render main page
-    pub fn render_page(&mut self, ui: &mut Ui) {
-        match self.page {
-            Page::Headlines => self.render_headlines_page(ui),
-            Page::Search => {
-                ui.centered_and_justified(|ui| {
-                    ui.heading("Someday");
-                });
-            }
-            Page::Settings | Page::Favored => {}
-        };
+    fn setup(&mut self, ctx: &Context, _frame: &EpiFrame, _storage: Option<&dyn EpiStorage>) {
+        self.config.load();
+        self.articles_mut(ctx); // TODO: remove
+        self.configure_fonts(ctx);
+        self.configure_styles(ctx, false);
     }
 
-    pub fn render_footer(&self, ctx: &Context) {
+    fn update(&mut self, ctx: &Context, frame: &EpiFrame) {
+        self.render_navbar(ctx, frame);
+
+        CentralPanel!(ctx, |ui| {
+            match self.page {
+                Headlines => self.render_headlines_page(ui),
+                Search => {}
+                Settings => self.render_settings_page(ui),
+                Favored => {}
+            };
+        });
+
         TopBottomPanel!(ctx, |ui| {
             VerticalCentered!(ui, |ui| {
                 Space!(10.0, ui);
@@ -59,38 +61,17 @@ impl App {
             });
         });
     }
-}
 
-impl epi::App for App {
-    fn name(&self) -> &str {
-        "Headlines"
-    }
-
-    fn setup(&mut self, ctx: &Context, _frame: &Frame, _storage: Option<&dyn epi::Storage>) {
-        fonts::configure(ctx);
-        let _ = self.articles_mut(ctx);
-
-        self.config.load();
-        self.config.ensure(ctx);
-    }
-
-    fn update(&mut self, ctx: &Context, frame: &Frame) {
-        self.render_navbar(ctx, frame);
-        CentralPanel!(ctx, |ui| {
-            self.update_style(ui);
-            self.render_page(ui);
-            self.render_footer(ctx);
-        });
+    fn on_exit(&mut self) {
+        self.config.store();
     }
 }
 
 fn main() {
-    tracing_subscriber::fmt().init();
-    #[allow(unused_mut)]
-    let mut options = NativeOptions::default();
+    let app: Box<App> = default();
+    let mut options: NativeOptions = default();
     options.initial_window_size = Some(Vec2::new(740., 960.));
 
-    let app: Box<App> = default();
-
+    tracing_subscriber::fmt().init();
     run_native(app, options);
 }

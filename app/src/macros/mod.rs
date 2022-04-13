@@ -34,43 +34,48 @@ macro_rules! Separator {
     };
 }
 
-macro_rules! _Label {
+macro_rules! Label {
     ($text:expr, $style:ident, $ui:ident) => {
         $ui.label(eframe::egui::RichText::new($text).text_style(eframe::egui::TextStyle::$style))
     };
 
-    ($text:expr, $style:expr, $ui:ident) => {
-        $ui.label(eframe::egui::RichText::new($text).text_style($style))
+    ($text:expr, $ui:ident) => {
+        $ui.label($text)
     };
-}
 
-macro_rules! Label {
+    // ($text:expr, $style:expr, $ui:ident) => {
+    //     $ui.label(eframe::egui::RichText::new($text).text_style($style))
+    // };
     ($ui:ident, $text:expr, $style:ident) => {
-        _Label!($text, $style, $ui)
+        Label!($text, $style, $ui)
     };
 
     ($text:expr, $style:ident, $ui:ident) => {
-        _Label!($text, $style, $ui)
+        Label!($text, $style, $ui)
     };
 
     ($ui:ident, $text:expr) => {
-        _Label!($text, Body, $ui)
+        Label!($text, Body, $ui)
     };
 
     ($text:expr, $ui:ident) => {
-        _Label!($text, Body, $ui)
+        Label!($text, Body, $ui)
     };
 
     ($text:expr, $style:ident, $ui:expr) => {
-        _Label!($text, $style, $ui)
+        Label!($text, $style, $ui)
     };
 
     ($ui:ident, $text:expr, $style:expr) => {
-        _Label!($text, $style, $ui)
+        Label!($text, $style, $ui)
     };
 
     ($text:expr, $color:ident, $style:ident, $ui:ident) => {
         $ui.colored_label($color, eframe::egui::RichText::new($text).$style())
+    };
+
+    ($style:ident, $text:expr,  $ui:ident) => {
+        Label!($text, $style, $ui)
     };
 }
 macro_rules! UiWithLayout {
@@ -107,6 +112,7 @@ macro_rules! TopBottomPanel {
     };
 }
 
+#[allow(unused_macros)]
 macro_rules! CentralPanel {
     ($ctx:ident, $cb:expr) => {
         eframe::egui::CentralPanel::default().show($ctx, $cb)
@@ -115,5 +121,5 @@ macro_rules! CentralPanel {
 
 pub(crate) use {
     Button, CentralPanel, Label, Layout, Separator, Space, TopBottomPanel, UiWithLayout,
-    VerticalCentered, _Label,
+    VerticalCentered,
 };
