@@ -9,16 +9,20 @@ use eframe::epi::Frame;
 
 /// FIX: use svg icons. text sizes differs
 impl App {
-    pub fn render_navbar(&mut self, ctx: &Context, _frame: &Frame) {
+    pub fn render_navbar(&mut self, ctx: &Context, frame: &Frame) {
         TopBottomPanel::top("top_panel").show(ctx, |ui| {
             Space!(5., ui);
             menu::bar(ui, |ui| {
-                Layout!(ui, left_to_right, |ui| {
-                    ui.label(RichText::new("📓").text_style(inner_link()));
-                });
+                Layout!(ui, left_to_right, |ui| ui
+                    .label(RichText::new("📓").text_style(inner_link())));
+
+                if frame.is_web() {
+                    VerticalCentered!(ui, |ui| ui
+                        .label(text("Headlines").size(22.).color(self.white())));
+                }
 
                 Layout!(ui, right_to_left, |ui| {
-                    Space!(5., ui);
+                    Space!(20., ui);
                     // self.close_app(ui, frame);
                     self.toggle_settings_window(ui);
                     self.refresh_articles(ui);
@@ -33,8 +37,7 @@ impl App {
     }
 
     pub fn render_header(&self, ui: &mut Ui, title: &str) {
-        VerticalCentered!(ui, |ui| ui
-            .label(text(title).size(35.).color(self.yellow())));
+        VerticalCentered!(ui, |ui| ui.label(text(title).size(35.)));
         Space!(crate::style::padding(), ui);
         Separator!(20., ui);
     }

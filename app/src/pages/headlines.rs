@@ -7,8 +7,6 @@ use eframe::egui::{Hyperlink, RichText, ScrollArea, Spinner, Ui};
 
 impl App {
     pub fn render_headlines_page(&mut self, ui: &mut Ui) {
-        self.render_header(ui, "Headlines");
-
         let heading_color = self.foreground_light();
         let read_more = RichText::new("Read More >").size(16.).monospace();
 
@@ -25,6 +23,9 @@ impl App {
                     });
                     Separator!(ui);
                 });
+
+                // FIXME: this is a quick hack to fix footer hiding part of the last article
+                Space!(75., ui);
             }
             Some(Err(error)) => {
                 ui.colored_label(self.red(), format!("Something wrong happend {error}"));

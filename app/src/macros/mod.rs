@@ -112,14 +112,6 @@ macro_rules! TopBottomPanel {
     };
 }
 
-#[allow(unused_macros)]
-macro_rules! CentralPanel {
-    ($ctx:ident, $cb:expr) => {
-        eframe::egui::CentralPanel::default().show($ctx, $cb)
-    };
-}
-
 pub(crate) use {
-    Button, CentralPanel, Label, Layout, Separator, Space, TopBottomPanel, UiWithLayout,
-    VerticalCentered,
+    Button, Label, Layout, Separator, Space, TopBottomPanel, UiWithLayout, VerticalCentered,
 };

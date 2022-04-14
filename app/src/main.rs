@@ -3,7 +3,7 @@
 use crate::config::Config;
 use crate::macros::*;
 use crate::pages::Page::{self, *};
-use eframe::egui::Context;
+use eframe::egui::{CentralPanel as EguiCentralPanel, Context};
 use eframe::epaint::Vec2;
 use eframe::epi::{App as EpiApp, Frame as EpiFrame, Storage as EpiStorage};
 use eframe::{run_native, NativeOptions};
@@ -41,15 +41,7 @@ impl EpiApp for App {
 
     fn update(&mut self, ctx: &Context, frame: &EpiFrame) {
         self.render_navbar(ctx, frame);
-
-        CentralPanel!(ctx, |ui| {
-            match self.page {
-                Headlines => self.render_headlines_page(ui),
-                Search => {}
-                Settings => self.render_settings_page(ui),
-                Favored => {}
-            };
-        });
+        self.render_pages(ctx, frame);
 
         TopBottomPanel!(ctx, |ui| {
             VerticalCentered!(ui, |ui| {
@@ -74,4 +66,19 @@ fn main() {
 
     tracing_subscriber::fmt().init();
     run_native(app, options);
+}
+
+impl App {
+    pub fn render_pages(&mut self, ctx: &Context, _frame: &EpiFrame) {
+        EguiCentralPanel::default()
+            .frame(self.get_default_frame())
+            .show(ctx, |ui| {
+                match self.page {
+                    Headlines => self.render_headlines_page(ui),
+                    Search => {}
+                    Settings => self.render_settings_page(ui),
+                    Favored => {}
+                };
+            });
+    }
 }

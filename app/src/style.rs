@@ -12,7 +12,7 @@ pub const fn padding() -> f32 {
     5.0
 }
 pub const fn margin() -> f32 {
-    30.0
+    20.0
 }
 
 pub fn is_dark_mode(ui: &Ui) -> bool {
@@ -38,11 +38,11 @@ impl App {
         let dark_mode = self.config.mode.is_dark();
         style.visuals = Visuals {
             dark_mode,
-            hyperlink_color: self.blue(),
+            hyperlink_color: self.red(),
             widgets: Widgets {
                 noninteractive: WidgetVisuals {
                     // Window Background,
-                    bg_fill: self.background(),
+                    bg_fill: self.background_2(),
                     // Separators, indentation lines, windows outlines
                     bg_stroke: Stroke::new(1.0, C::from_gray(if dark_mode { 60 } else { 190 })),
                     // Normal text color
@@ -75,16 +75,17 @@ impl App {
         }
     }
 
-    #[allow(dead_code)]
-    /// FIXME: sets very dark background or reset it
+    /// TODO: make this called once somehow.
     pub fn get_default_frame(&self) -> Frame {
         Frame {
             margin: Margin {
                 left: margin(),
-                right: margin(),
-                top: margin(),
+                right: 14.,
+                top: 10.,
                 bottom: margin(),
             },
+            fill: self.background(),
+
             ..default()
         }
     }
