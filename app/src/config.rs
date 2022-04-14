@@ -7,6 +7,7 @@ pub struct Config {
     pub mode: Mode,
     pub api_key: String,
 }
+
 impl AsRef<Config> for Config {
     fn as_ref(&self) -> &Config {
         &self
@@ -15,22 +16,23 @@ impl AsRef<Config> for Config {
 
 impl Config {
     pub fn load(&mut self) {
-        match confy::load("headlines") {
+        match confy::load("headlines", None) {
             Ok(config) => {
                 *self = config;
-                tracing::trace!("Configuration loaded.");
+                tracing::trace!("Configuration loaded!");
             }
             Err(e) => {
-                tracing::error!("Unable to load config from files {e}");
+                tracing::error!("[Fail load config from files]: {e}");
             }
         }
     }
 
-    pub fn store(&self) {
-        if let Err(e) = confy::store("headlines", self) {
-            return tracing::error!("Unable to save configuration {e}!");
+    pub fn persist(&self) {
+        if let Err(e) = confy::store("headlines", None, self) {
+            tracing::error!("[Fail to save configuration]: {:#?}", e);
+        } else {
+            tracing::trace!("Configuration saved!.");
         }
-        tracing::trace!("Configuration saved.")
     }
 
     pub fn has_api_key(&self) -> bool {
