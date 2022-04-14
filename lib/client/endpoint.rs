@@ -1,6 +1,6 @@
 use strum::{AsRefStr, EnumString};
 
-#[derive(AsRefStr, EnumString, Default)]
+#[derive(AsRefStr, EnumString, Default, Debug)]
 #[strum(serialize_all = "snake_case")]
 pub enum EndPoint {
     #[strum(serialize = "top-headlines")]

@@ -1,6 +1,6 @@
 use strum::{AsRefStr, EnumString};
 
-#[derive(Clone, AsRefStr, EnumString)]
+#[derive(Clone, AsRefStr, EnumString, Debug)]
 #[strum(serialize_all = "lowercase")]
 pub enum ArticleQueryScope {
     Title,

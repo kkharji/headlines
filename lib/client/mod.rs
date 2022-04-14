@@ -1,5 +1,5 @@
 #[cfg_attr(feature = "cli", derive(clap::Parser))]
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Request {
     /// NewsApi Search Query:
     ///

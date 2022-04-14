@@ -17,38 +17,54 @@ impl Request {
     }
 
     /// Set the scope in which to search for with [`Request.query`]
-    pub fn scope(mut self, searchin: &[ArticleQueryScope]) -> Self {
-        self.scope = searchin.to_vec();
+    pub fn scope<T: AsRef<[ArticleQueryScope]> + Into<Vec<ArticleQueryScope>>>(
+        mut self,
+        searchin: T,
+    ) -> Self {
+        self.scope = searchin.into();
         self
     }
 
     /// Set request's sources.
-    pub fn sources(mut self, sources: &[&str]) -> Self {
+
+    pub fn sources<T>(mut self, sources: T) -> Self
+    where
+        T: IntoIterator,
+        T::Item: std::fmt::Display,
+    {
         self.sources = Some(
             sources
                 .into_iter()
-                .map(ToString::to_string)
+                .map(|s| s.to_string())
                 .collect::<Vec<_>>(),
         );
         self
     }
 
     /// Set request's domains.
-    pub fn domains(mut self, domains: &[&str]) -> Self {
+    pub fn domains<T>(mut self, domains: T) -> Self
+    where
+        T: IntoIterator,
+        T::Item: std::fmt::Display,
+    {
         self.domains = Some(
             domains
                 .into_iter()
-                .map(ToString::to_string)
+                .map(|s| s.to_string())
                 .collect::<Vec<_>>(),
         );
         self
     }
 
     /// Set request's domains to exclude.
-    pub fn exclude_domains(mut self, exclude_domains: &[&str]) -> Self {
+    pub fn exclude_domains<T>(mut self, exclude_domains: T) -> Self
+    where
+        T: IntoIterator,
+        T::Item: std::fmt::Display,
+    {
         let value = exclude_domains
             .into_iter()
-            .map(ToString::to_string)
+            .map(|s| s.to_string())
             .collect::<Vec<_>>();
         self.exclude_domains = Some(value);
         self
@@ -85,11 +101,15 @@ impl Request {
     }
 
     /// Set the request's query.
-    pub fn query(mut self, query: &[&str]) -> Self {
+    pub fn query<T>(mut self, query: T) -> Self
+    where
+        T: IntoIterator,
+        T::Item: std::fmt::Display,
+    {
         let value = query
             .into_iter()
-            .map(ToString::to_string)
-            .collect::<Vec<_>>();
+            .map(|s| s.to_string())
+            .collect::<Vec<String>>();
         self.query = value;
         self
     }
