@@ -1,8 +1,9 @@
 use eyre::Context;
+use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use strum::{AsRefStr, EnumString};
 
-#[derive(EnumString, AsRefStr, Debug)]
+#[derive(EnumString, AsRefStr, Debug, Serialize, Deserialize, Clone)]
 #[strum(serialize_all = "lowercase")]
 pub enum ArticleCategory {
     Entertainment,

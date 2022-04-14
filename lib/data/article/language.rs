@@ -1,6 +1,7 @@
+use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumString};
 
-#[derive(EnumString, AsRefStr, Debug, Default)]
+#[derive(EnumString, AsRefStr, Debug, Default, Serialize, Deserialize, Clone)]
 #[strum(serialize_all = "lowercase")]
 pub enum ArticleLanguage {
     #[default]

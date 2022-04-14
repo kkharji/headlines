@@ -1,6 +1,7 @@
+use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumString};
 
-#[derive(Clone, AsRefStr, EnumString, Debug)]
+#[derive(Clone, AsRefStr, EnumString, Debug, Serialize, Deserialize)]
 #[strum(serialize_all = "lowercase")]
 pub enum ArticleQueryScope {
     Title,

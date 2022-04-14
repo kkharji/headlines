@@ -109,7 +109,8 @@ impl Request {
         let value = query
             .into_iter()
             .map(|s| s.to_string())
-            .collect::<Vec<String>>();
+            .collect::<Vec<String>>()
+            .join(" ");
         self.query = value;
         self
     }

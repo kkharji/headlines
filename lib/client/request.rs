@@ -12,7 +12,7 @@ pub fn from_cli_args() -> Request {
 
 impl Request {
     #[cfg(feature = "net_block")]
-    pub fn run(self) -> Result<Articles> {
+    pub fn run(&self) -> Result<Articles> {
         let request = parser::parse(&self, ureq::get(&self.url()))?;
 
         #[cfg(feature = "cache")]
@@ -41,7 +41,7 @@ impl Request {
     }
 
     #[cfg(feature = "net_async")]
-    pub async fn run_async(self) -> Result<Articles> {
+    pub async fn run_async(&self) -> Result<Articles> {
         let client = reqwest::Client::new();
         let request = parser::parse(&self, client.get(self.url()))?.build()?;
 
@@ -72,16 +72,16 @@ impl Request {
         Ok(result)
     }
 
-    #[cfg(feature = "egui")]
-    pub fn run_promise(
-        self,
-        ctx: &eframe::egui::Context,
-    ) -> poll_promise::Promise<Result<Articles>> {
-        let ctx = ctx.clone();
-        poll_promise::Promise::spawn_thread("newsapi", move || {
-            let articles = self.run()?;
-            ctx.request_repaint();
-            Ok(articles)
-        })
-    }
+    // #[cfg(feature = "egui")]
+    // pub fn run_promise(
+    //     self,
+    //     ctx: &eframe::egui::Context,
+    // ) -> poll_promise::Promise<Result<Articles>> {
+    //     let ctx = ctx.clone();
+    //     poll_promise::Promise::spawn_thread("newsapi", move || {
+    //         let articles = self.run()?;
+    //         ctx.request_repaint();
+    //         Ok(articles)
+    //     })
+    // }
 }

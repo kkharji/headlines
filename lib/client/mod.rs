@@ -1,12 +1,12 @@
 #[cfg_attr(feature = "cli", derive(clap::Parser))]
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Deserialize, Serialize, Clone)]
 pub struct Request {
     /// NewsApi Search Query:
     ///
     /// Must appear (Eg: +bitcoin).
     /// Must not appear (Eg: -bitcoin).
     /// AND / OR / NOT keywords: (Eg: crypto, AND, (ethereum, OR, litecoin), NOT, bitcoin)
-    pub(super) query: Vec<String>,
+    pub(super) query: String,
 
     /// Type of query: everything, top-headings
     #[cfg_attr(feature = "cli", clap(short, long, default_value_t = endpoint::everything()))]
@@ -22,38 +22,47 @@ pub struct Request {
 
     /// Limit number of results to return
     #[cfg_attr(feature = "cli", clap(short = 'l', long = "limit"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub(super) page_size: Option<u32>,
 
     /// Page through results
     #[cfg_attr(feature = "cli", clap(short = 'P', long))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub(super) page: Option<u32>,
 
     /// Source to search in. Max 20 sources.
     #[cfg_attr(feature = "cli", clap(short = 'i', long = "in"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub(super) sources: Option<Vec<String>>,
 
     /// Doamins to search in
     #[cfg_attr(feature = "cli", clap(short, long))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub(super) domains: Option<Vec<String>>,
 
     /// Doamins to exclude
     #[cfg_attr(feature = "cli", clap(short = 'E', long))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub(super) exclude_domains: Option<Vec<String>>,
 
     /// Date range start
     #[cfg_attr(feature = "cli", clap(short, long))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub(super) from: Option<chrono::NaiveDate>,
 
     /// Date range end
     #[cfg_attr(feature = "cli", clap(short, long))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub(super) to: Option<chrono::NaiveDate>,
 
     /// Article category
     #[cfg_attr(feature = "cli", clap(short, long))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub(super) category: Option<ArticleCategory>,
 
     /// Source country
     #[cfg_attr(feature = "cli", clap(short = 'C', long))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub(super) country: Option<String>,
 }
 
@@ -62,6 +71,14 @@ pub struct Request {
 pub fn request() -> Request {
     Default::default()
 }
+
+#[test]
+fn test_serialize() {
+    let request = Request::default();
+    toml::to_string(&request).unwrap();
+}
+
+use serde::{Deserialize, Serialize};
 
 use crate::article::category::ArticleCategory;
 use crate::article::ArticleLanguage;

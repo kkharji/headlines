@@ -1,6 +1,7 @@
+use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumString};
 
-#[derive(AsRefStr, EnumString, Default, Debug)]
+#[derive(AsRefStr, EnumString, Default, Debug, Serialize, Deserialize, Clone)]
 #[strum(serialize_all = "snake_case")]
 pub enum EndPoint {
     #[strum(serialize = "top-headlines")]

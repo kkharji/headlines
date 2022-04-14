@@ -7,25 +7,31 @@ fn with_domains_builder() -> Request {
 }
 
 fn with_single_query_builder() -> Request {
-    Request::default().query(&["api"])
+    Request::default().query(&["api"]).limit(1)
 }
 
-fn with_mutliple_queries_builder() -> Request {
+fn with_multiple_queries_builder() -> Request {
     Request::default().query(&["api", "rust", "mac", "requestothing"])
 }
 
 fn between_dates_free_builder() -> Request {
-    Request::default().query(&["news"]).between(
-        Utc::now().date().naive_utc() - chrono::Duration::weeks(4),
-        Utc::now().date().naive_utc(),
-    )
+    Request::default()
+        .query(&["news"])
+        .between(
+            Utc::now().date().naive_utc() - chrono::Duration::weeks(4),
+            Utc::now().date().naive_utc(),
+        )
+        .limit(1)
 }
 
 fn between_dates_paid_builder() -> Request {
-    Request::default().query(&["news"]).between(
-        NaiveDate::from_ymd(2022, 01, 20),
-        Utc::now().date().naive_utc(),
-    )
+    Request::default()
+        .query(&["news"])
+        .between(
+            NaiveDate::from_ymd(2022, 01, 20),
+            Utc::now().date().naive_utc(),
+        )
+        .limit(1)
 }
 
 fn assert_with_domains_builder(articles: Articles) {
@@ -68,7 +74,7 @@ mod net_async {
 
     #[tokio::test]
     async fn with_multiple_queries() {
-        assert_no_results(with_mutliple_queries_builder().run_async().await.unwrap());
+        assert_no_results(with_multiple_queries_builder().run_async().await.unwrap());
     }
 
     #[tokio::test]
@@ -97,7 +103,7 @@ mod net_block {
 
     #[test]
     fn with_multiple_queries() {
-        assert_no_results(with_mutliple_queries_builder().run().unwrap());
+        assert_no_results(with_multiple_queries_builder().run().unwrap());
     }
 
     #[test]

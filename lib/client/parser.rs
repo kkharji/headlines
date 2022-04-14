@@ -14,7 +14,7 @@ pub(crate) fn parse<T: Parser>(b: &Request, r: T) -> Result<T> {
     push_opt_to_string!("pageSize", b.page_size, queries);
     push_opt_to_string!("page", b.page, queries);
 
-    push_vec!("q", b.query, queries, " ");
+    push_to_string!("q", b.query, queries);
 
     if b.endpoint.is_top_headlines() {
         push_opt_to_string!("category", b.category, queries);
