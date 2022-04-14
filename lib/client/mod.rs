@@ -1,6 +1,11 @@
 #[cfg_attr(feature = "cli", derive(clap::Parser))]
 #[derive(Default, Debug, Deserialize, Serialize, Clone)]
 pub struct Request {
+    /// Request Name. Used Internally and always set to empty if not explicitly set by the consumer
+    #[cfg_attr(feature = "cli", clap(skip))]
+    #[serde(default)]
+    pub name: String,
+
     /// NewsApi Search Query:
     ///
     /// Must appear (Eg: +bitcoin).
@@ -72,16 +77,9 @@ pub fn request() -> Request {
     Default::default()
 }
 
-#[test]
-fn test_serialize() {
-    let request = Request::default();
-    toml::to_string(&request).unwrap();
-}
-
-use serde::{Deserialize, Serialize};
-
 use crate::article::category::ArticleCategory;
 use crate::article::ArticleLanguage;
+use serde::{Deserialize, Serialize};
 
 #[cfg(test)]
 mod tests;

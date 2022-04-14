@@ -16,6 +16,12 @@ impl Request {
         self.endpoint.inject_url(BASEURL)
     }
 
+    /// Get Request url
+    pub fn set_name(mut self, name: &str) -> Self {
+        self.name = name.into();
+        self
+    }
+
     /// Set the scope in which to search for with [`Request.query`]
     pub fn scope<T: AsRef<[ArticleQueryScope]> + Into<Vec<ArticleQueryScope>>>(
         mut self,
