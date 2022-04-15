@@ -18,7 +18,12 @@ pub(crate) fn parse<T: Parser>(b: &Request, r: T) -> Result<T> {
 
     if b.endpoint.is_top_headlines() {
         push_opt_to_string!("category", b.category, queries);
-        push_opt_to_string!("country", b.country, queries);
+        // TOOD: find a better way to do this
+        push_opt_to_string!(
+            "country",
+            b.country.map(|s| s.as_ref().to_string()),
+            queries
+        );
     } else {
         push_to_string!("language", b.language, queries);
         push_vec!("searchin", b.scope, queries);

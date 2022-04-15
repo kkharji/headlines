@@ -1,4 +1,4 @@
-#![feature(derive_default_enum)]
+#![feature(derive_default_enum, default_free_fn)]
 
 #[cfg(any(feature = "net_block", feature = "net_async"))]
 pub mod client;

@@ -21,7 +21,7 @@ impl EndPoint {
         }
     }
 
-    pub(crate) fn is_top_headlines(&self) -> bool {
+    pub fn is_top_headlines(&self) -> bool {
         matches!(self, Self::TopHeadlines)
     }
 }

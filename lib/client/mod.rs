@@ -68,7 +68,7 @@ pub struct Request {
     /// Source country
     #[cfg_attr(feature = "cli", clap(short = 'C', long))]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub country: Option<String>,
+    pub country: Option<country::Country>,
 }
 
 /// Return inline default of [`Request`]
@@ -88,6 +88,7 @@ mod tests;
 pub mod endpoint;
 
 pub(crate) mod builder;
+pub mod country;
 pub(crate) mod macros;
 pub(crate) mod parser;
 pub mod request;
