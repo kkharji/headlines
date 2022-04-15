@@ -10,7 +10,7 @@ impl App {
             ui.label("Api Key: ");
 
             // TODO: find a way to ensure that the key is correct
-            ui.text_edit_singleline(&mut self.config.api_key);
+            ui.text_edit_singleline(&mut self.state.api_key);
         });
     }
 }

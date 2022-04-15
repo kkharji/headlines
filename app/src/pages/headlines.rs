@@ -1,39 +1,44 @@
 //! Main Headline page
 
-use crate::macros::*;
 use crate::style::padding;
 use crate::App;
-use eframe::egui::{Hyperlink, RichText, ScrollArea, Spinner, Ui};
+use crate::{macros::UiWithLayout, style::text};
+use eframe::egui::{RichText, ScrollArea, Spinner, Ui};
 
 impl App {
     pub fn render_headlines_page(&mut self, ui: &mut Ui) {
         let heading_color = self.foreground_light();
+        let current_query_key = self.state.current_query_key.to_string();
         let read_more = RichText::new("Read More >").size(16.).monospace();
+        let title = |title: &str| text(&format!("▶ {title}")).heading().color(heading_color);
 
-        ScrollArea::vertical().show(ui, |ui| match &self.articles(ui.ctx()) {
+        match self.store.try_get_articles(&current_query_key, false) {
             Some(Ok(articles)) => {
-                articles.iter().take(30).for_each(|a| {
-                    Space!(padding(), ui);
-                    Label!(format!("▶ {}", a.title), heading_color, heading, ui);
-                    Space!(padding(), ui);
-                    Label!(&a.description, ui);
-                    Space!(padding(), ui);
-                    UiWithLayout!(ui, left_to_right, 24.0, |ui| {
-                        ui.add(Hyperlink::from_label_and_url(read_more.clone(), &a.url))
-                    });
-                    Separator!(ui);
-                });
+                ScrollArea::vertical().show(ui, |ui| {
+                    articles.iter().for_each(|a| {
+                        ui.add_space(padding());
 
-                // FIXME: this is a quick hack to fix footer hiding part of the last article
-                Space!(75., ui);
+                        ui.label(title(&a.title));
+                        ui.add_space(padding());
+
+                        ui.label(&a.description);
+                        ui.add_space(padding());
+
+                        UiWithLayout!(ui, left_to_right, 24.0, |ui| {
+                            ui.hyperlink_to(read_more.clone(), &a.url);
+                        });
+
+                        ui.separator();
+                    });
+                });
             }
-            Some(Err(error)) => {
-                ui.colored_label(self.red(), format!("Something wrong happend {error}"));
+            Some(Err(e)) => {
+                ui.colored_label(self.red(), format!("Something wrong happend {e}"));
             }
             None => {
                 ui.heading("Loading");
                 ui.add(Spinner::new());
             }
-        });
+        };
     }
 }

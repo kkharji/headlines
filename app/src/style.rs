@@ -32,10 +32,10 @@ pub fn heading<S: Into<String>>(text: S) -> RichText {
 impl App {
     pub fn configure_styles(&mut self, ctx: &Context, toggle_mode: bool) {
         if toggle_mode {
-            self.config.mode.toggle();
+            self.state.mode.toggle();
         };
         let mut style = (*ctx.style()).clone();
-        let dark_mode = self.config.mode.is_dark();
+        let dark_mode = self.state.mode.is_dark();
         style.visuals = Visuals {
             dark_mode,
             hyperlink_color: self.red(),

@@ -11,7 +11,7 @@ macro_rules! colorscheme {
                 })+
 
                 pub fn $name(&self) -> Color32 {
-                    if self.config.mode.is_dark() { self.[<$name _dark>]() } else { self.[<$name _light>]() }
+                    if self.state.mode.is_dark() { self.[<$name _dark>]() } else { self.[<$name _light>]() }
                 }
             })+
         }

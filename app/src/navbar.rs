@@ -26,7 +26,7 @@ impl App {
                     // self.close_app(ui, frame);
                     self.toggle_settings_window(ui);
                     self.refresh_articles(ui);
-                    if self.config.mode.render_button(ui).clicked() {
+                    if self.state.mode.render_button(ui).clicked() {
                         self.configure_styles(ui.ctx(), true);
                     };
                     self.page.render_button(ui, true);
