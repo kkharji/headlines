@@ -1,12 +1,13 @@
 use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, EnumString};
+use strum::{AsRefStr, EnumIter, EnumString};
 
-#[derive(AsRefStr, EnumString, Default, Debug, Serialize, Deserialize, Clone)]
+#[derive(
+    AsRefStr, EnumString, Default, Debug, Serialize, Deserialize, EnumIter, PartialEq, Clone, Copy,
+)]
 #[strum(serialize_all = "snake_case")]
 pub enum EndPoint {
     #[strum(serialize = "top-headlines")]
     TopHeadlines,
-    Top,
     #[default]
     Everything,
 }
@@ -21,7 +22,7 @@ impl EndPoint {
     }
 
     pub(crate) fn is_top_headlines(&self) -> bool {
-        matches!(self, Self::TopHeadlines) || matches!(self, Self::Top)
+        matches!(self, Self::TopHeadlines)
     }
 }
 
