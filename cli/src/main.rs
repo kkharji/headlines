@@ -17,9 +17,9 @@ mod tests {
             - published in thehill and theverge
         */
         request()
-            .query(["announce that"])
             .headlines()
-            .limit(5)
+            .set_query(["announce that"])
+            .set_limit(5)
             .run()
             .unwrap()
             .render();
@@ -34,12 +34,12 @@ mod tests {
             - published in bbc-news and engadget
         */
         request()
-            .query(["Elon Musk"])
             .everything()
-            .limit(10)
-            .scope([scope::content()])
-            .language(lang::en())
-            .sources(["bbc-news", "engadget"])
+            .set_query(["Elon Musk"])
+            .set_limit(10)
+            .set_scope([scope::content()])
+            .set_language(lang::en())
+            .set_sources(["bbc-news", "engadget"])
             .run()
             .unwrap()
             .render();

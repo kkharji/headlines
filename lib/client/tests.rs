@@ -3,35 +3,35 @@ use crate::Articles;
 use chrono::{NaiveDate, Utc};
 
 fn with_domains_builder() -> Request {
-    Request::default().domains(&["techcrunch.com", "thenextweb.com"])
+    request().set_domains(&["techcrunch.com", "thenextweb.com"])
 }
 
 fn with_single_query_builder() -> Request {
-    Request::default().query(&["api"]).limit(1)
+    request().set_query(&["api"]).set_limit(1)
 }
 
 fn with_multiple_queries_builder() -> Request {
-    Request::default().query(&["api", "rust", "mac", "requestothing"])
+    request().set_query(&["api", "rust", "mac", "requestothing"])
 }
 
 fn between_dates_free_builder() -> Request {
     Request::default()
-        .query(&["news"])
+        .set_query(&["news"])
         .between(
             Utc::now().date().naive_utc() - chrono::Duration::weeks(4),
             Utc::now().date().naive_utc(),
         )
-        .limit(1)
+        .set_limit(1)
 }
 
 fn between_dates_paid_builder() -> Request {
     Request::default()
-        .query(&["news"])
+        .set_query(&["news"])
         .between(
             NaiveDate::from_ymd(2022, 01, 20),
             Utc::now().date().naive_utc(),
         )
-        .limit(1)
+        .set_limit(1)
 }
 
 fn assert_with_domains_builder(articles: Articles) {

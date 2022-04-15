@@ -23,7 +23,7 @@ impl Request {
     }
 
     /// Set the scope in which to search for with [`Request.query`]
-    pub fn scope<T: AsRef<[ArticleQueryScope]> + Into<Vec<ArticleQueryScope>>>(
+    pub fn set_scope<T: AsRef<[ArticleQueryScope]> + Into<Vec<ArticleQueryScope>>>(
         mut self,
         searchin: T,
     ) -> Self {
@@ -33,7 +33,7 @@ impl Request {
 
     /// Set request's sources.
 
-    pub fn sources<T>(mut self, sources: T) -> Self
+    pub fn set_sources<T>(mut self, sources: T) -> Self
     where
         T: IntoIterator,
         T::Item: std::fmt::Display,
@@ -48,7 +48,7 @@ impl Request {
     }
 
     /// Set request's domains.
-    pub fn domains<T>(mut self, domains: T) -> Self
+    pub fn set_domains<T>(mut self, domains: T) -> Self
     where
         T: IntoIterator,
         T::Item: std::fmt::Display,
@@ -63,7 +63,7 @@ impl Request {
     }
 
     /// Set request's domains to exclude.
-    pub fn exclude_domains<T>(mut self, exclude_domains: T) -> Self
+    pub fn set_exclude_domains<T>(mut self, exclude_domains: T) -> Self
     where
         T: IntoIterator,
         T::Item: std::fmt::Display,
@@ -77,37 +77,37 @@ impl Request {
     }
 
     /// Set min date to return articles.
-    pub fn from(mut self, from: NaiveDate) -> Self {
+    pub fn set_from(mut self, from: NaiveDate) -> Self {
         self.from = Some(from);
         self
     }
 
     /// Set max date to return articles.
-    pub fn upto(mut self, to: NaiveDate) -> Self {
+    pub fn set_upto(mut self, to: NaiveDate) -> Self {
         self.to = Some(to);
         self
     }
 
     /// Set articles language.
-    pub fn language(mut self, language: ArticleLanguage) -> Self {
+    pub fn set_language(mut self, language: ArticleLanguage) -> Self {
         self.language = language.into();
         self
     }
 
     /// Set the request's page.
-    pub fn page(mut self, page: u32) -> Self {
+    pub fn set_page(mut self, page: u32) -> Self {
         self.page = Some(page);
         self
     }
 
     /// Set a limit to the number of results returned.
-    pub fn limit(mut self, page_size: u32) -> Self {
-        self.page_size = Some(page_size);
+    pub fn set_limit(mut self, limit: u32) -> Self {
+        self.limit = Some(limit);
         self
     }
 
     /// Set the request's query.
-    pub fn query<T>(mut self, query: T) -> Self
+    pub fn set_query<T>(mut self, query: T) -> Self
     where
         T: IntoIterator,
         T::Item: std::fmt::Display,
@@ -121,12 +121,14 @@ impl Request {
         self
     }
 
-    pub fn between(self, from: NaiveDate, to: NaiveDate) -> Self {
-        self.from(from).upto(to)
+    pub fn between(mut self, from: NaiveDate, to: NaiveDate) -> Self {
+        self.from = from.into();
+        self.to = to.into();
+        self
     }
 
     /// Set the request's endpoint.
-    pub fn endpoint(mut self, endpoint: EndPoint) -> Self {
+    pub fn set_endpoint(mut self, endpoint: EndPoint) -> Self {
         self.endpoint = endpoint;
         self
     }
