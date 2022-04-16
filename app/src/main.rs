@@ -9,13 +9,16 @@ mod state;
 mod store;
 mod style;
 
+use std::default::default;
+
 use crate::macros::*;
 use crate::pages::Page::{self, *};
 use crate::state::State;
-use eframe::egui::{CentralPanel as EguiCentralPanel, Context};
+use eframe::egui::{CentralPanel as EguiCentralPanel, Context as EguiContext};
 use eframe::epaint::Vec2;
-use eframe::epi::{App as EpiApp, Frame as EpiFrame, Storage as EpiStorage};
-use eframe::{run_native, NativeOptions};
+use eframe::epi::{App as EpiApp, Frame as EpiFrame};
+use eframe::CreationContext;
+use eframe::{glow::Context as GlowContext, NativeOptions};
 
 use store::Store;
 
@@ -26,8 +29,36 @@ pub struct App {
     pub store: Store,
 }
 
+impl EpiApp for App {
+    fn update(&mut self, ctx: &EguiContext, frame: &mut EpiFrame) {
+        self.render_navbar(ctx, frame);
+        self.render_pages(ctx, frame);
+        self.render_footer(ctx);
+    }
+
+    fn on_exit(&mut self, _gl: &GlowContext) {
+        self.state.persist();
+    }
+}
+
 impl App {
-    pub fn render_pages(&mut self, ctx: &Context, _frame: &EpiFrame) {
+    pub fn new(cc: &CreationContext<'_>) -> Self {
+        let mut app = App::default();
+        app.state.load();
+        let ctx = &cc.egui_ctx;
+        app.configure_fonts(&ctx);
+        app.configure_styles(&ctx, false);
+        app.state.current_query_key = "Covid News".into();
+        app.state.queries.push(
+            headlines::client::request()
+                .set_name(&app.state.current_query_key)
+                .set_query(["covid-19"]),
+        );
+        app.store.request_articles(app.state.as_ref(), false);
+        app
+    }
+
+    pub fn render_pages(&mut self, ctx: &EguiContext, _frame: &EpiFrame) {
         EguiCentralPanel::default()
             .frame(self.get_default_frame())
             .show(ctx, |ui| {
@@ -52,7 +83,7 @@ impl App {
             });
     }
 
-    pub fn render_footer(&mut self, ctx: &Context) {
+    pub fn render_footer(&mut self, ctx: &EguiContext) {
         TopBottomPanel!(ctx, |ui| {
             VerticalCentered!(ui, |ui| {
                 Space!(10.0, ui);
@@ -65,41 +96,14 @@ impl App {
     }
 }
 
-impl EpiApp for App {
-    fn name(&self) -> &str {
-        "Headlines"
-    }
-
-    fn setup(&mut self, ctx: &Context, _frame: &EpiFrame, _storage: Option<&dyn EpiStorage>) {
-        self.state.load();
-        self.configure_fonts(ctx);
-        self.configure_styles(ctx, false);
-        self.state.current_query_key = "Covid News".into();
-        self.state.queries.push(
-            headlines::client::request()
-                .set_name(&self.state.current_query_key)
-                .query(["covid-19"]),
-        );
-        self.store.request_articles(self.state.as_ref(), false);
-    }
-
-    fn update(&mut self, ctx: &Context, frame: &EpiFrame) {
-        self.render_navbar(ctx, frame);
-        self.render_pages(ctx, frame);
-        self.render_footer(ctx);
-    }
-
-    fn on_exit(&mut self) {
-        self.state.persist();
-    }
-}
-
 fn main() {
-    let app: Box<App> = Default::default();
-    let mut options: NativeOptions = Default::default();
-    options.initial_window_size = Some(Vec2::new(740., 960.));
-
     tracing_subscriber::fmt().init();
-
-    run_native(app, options);
+    eframe::run_native(
+        "Headlines",
+        NativeOptions {
+            initial_window_size: Some(Vec2::new(740., 960.)),
+            ..default()
+        },
+        Box::new(|cc| Box::new(App::new(cc))),
+    );
 }

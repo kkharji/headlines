@@ -6,7 +6,7 @@ description = "Experimental NewsApi UI client with egui"
 
 
 [dependencies]
-eframe       = { version = "0.17.0" }
+eframe = { git = "https://github.com/emilk/egui", package = "eframe" }
 serde        = { version = "1.0.136", features = ["derive"] }
 headlines    = { path = "../", features = ["egui", "cache"] }
 strum        = { version = "0.24.0",  features = ["derive"] }

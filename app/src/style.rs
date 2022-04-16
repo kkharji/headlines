@@ -78,7 +78,7 @@ impl App {
     /// TODO: make this called once somehow.
     pub fn get_default_frame(&self) -> Frame {
         Frame {
-            margin: Margin {
+            inner_margin: Margin {
                 left: margin(),
                 right: 14.,
                 top: 10.,
